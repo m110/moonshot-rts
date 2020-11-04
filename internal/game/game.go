@@ -160,6 +160,36 @@ func (g *Game) SpawnObject(object objects.Object) {
 	}
 }
 
+func (g *Game) SpawnPanel(panel objects.Panel) {
+	for _, s := range g.systems {
+		switch system := s.(type) {
+		case *systems.DrawingSystem:
+			system.Add(panel)
+			for _, c := range panel.GetWorldSpace().Children {
+				d, ok := c.(systems.DrawingEntity)
+				if ok {
+					system.Add(d)
+				}
+			}
+		}
+	}
+}
+
+func (g *Game) RemovePanel(panel objects.Panel) {
+	for _, s := range g.systems {
+		switch system := s.(type) {
+		case *systems.DrawingSystem:
+			system.Remove(panel)
+			for _, c := range panel.GetWorldSpace().Children {
+				d, ok := c.(systems.DrawingEntity)
+				if ok {
+					system.Remove(d)
+				}
+			}
+		}
+	}
+}
+
 func (g *Game) SpawnDrawingEntity(entity systems.DrawingEntity) {
 	for _, s := range g.systems {
 		switch system := s.(type) {

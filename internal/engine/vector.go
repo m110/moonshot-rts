@@ -7,6 +7,10 @@ type Vector struct {
 	Y float64
 }
 
+func (v Vector) IsZero() bool {
+	return v.X == 0 && v.Y == 0
+}
+
 func (v Vector) Unpack() (x float64, y float64) {
 	return v.X, v.Y
 }

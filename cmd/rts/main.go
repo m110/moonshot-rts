@@ -19,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	err = atlas.LoadSprites("assets/spritesheet.xml")
+	err = atlas.LoadSprites("assets/spritesheet.xml", "assets/ui.xml")
 	if err != nil {
 		panic(err)
 	}

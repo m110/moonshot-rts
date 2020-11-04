@@ -110,6 +110,17 @@ func (s Sprite) Pivot() Vector {
 	return s.pivot
 }
 
+func (s *Sprite) Scale(scale Vector) {
+	w, h := s.image.Size()
+	scaled := ebiten.NewImage(int(float64(w)*scale.X), int(float64(h)*scale.Y))
+
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(scale.Unpack())
+	scaled.DrawImage(s.image, op)
+
+	s.image = scaled
+}
+
 // Draw draws source sprite on the sprite.
 func (s Sprite) Draw(source Sprite) {
 	s.DrawAtPosition(source, 0, 0)
@@ -128,6 +139,7 @@ func (s Sprite) DrawAtPoint(source Sprite, p Point) {
 // DrawAtPosition draws source sprite on the sprite at given position.
 func (s Sprite) DrawAtPosition(source Sprite, x int, y int) {
 	op := &ebiten.DrawImageOptions{}
+
 	op.GeoM.Translate(
 		float64(x)-source.Pivot().X,
 		float64(y)-source.Pivot().Y,

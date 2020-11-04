@@ -44,6 +44,7 @@ It requires an entity with `Drawable` (a sprite) and `WorldSpace` (a position) c
 This will possibly change, but right now:
 
 * [Medieval RTS from Kenney](https://kenney.nl/assets/medieval-rts)
+* [UI Pack: RPG Expansion from Kenney](https://kenney.nl/assets/ui-pack-rpg-expansion)
 * OpenSans font from Google
 
 ## Running

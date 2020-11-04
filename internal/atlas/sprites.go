@@ -31,6 +31,10 @@ var (
 	BarracksTop engine.Sprite
 
 	Units = map[components.Team]map[components.Class]engine.Sprites{}
+
+	PanelBrown         engine.Sprite
+	ButtonBeige        engine.Sprite
+	ButtonBeigePressed engine.Sprite
 )
 
 type TeamSprites struct {
@@ -40,18 +44,23 @@ type TeamSprites struct {
 	Gray  engine.Sprite
 }
 
-func LoadSprites(atlasDescriptorPath string) error {
-	atlas, err := NewAtlas(atlasDescriptorPath)
+func LoadSprites(rtsPath string, uiPath string) error {
+	rtsAtlas, err := NewAtlas(rtsPath)
 	if err != nil {
 		return err
 	}
 
-	Grass1 = engine.NewSpriteFromImage(atlas.ImageByName("grass_1"))
-	Sand1 = engine.NewSpriteFromImage(atlas.ImageByName("sand_1"))
-	Water1 = engine.NewSpriteFromImage(atlas.ImageByName("water_1"))
+	uiAtlas, err := NewAtlas(uiPath)
+	if err != nil {
+		return err
+	}
+
+	Grass1 = engine.NewSpriteFromImage(rtsAtlas.ImageByName("grass_1"))
+	Sand1 = engine.NewSpriteFromImage(rtsAtlas.ImageByName("sand_1"))
+	Water1 = engine.NewSpriteFromImage(rtsAtlas.ImageByName("water_1"))
 
 	loadSpritePivotBottom := func(name string) engine.Sprite {
-		return engine.NewSpriteFromImageWithPivotType(atlas.ImageByName(name), engine.PivotBottom)
+		return engine.NewSpriteFromImageWithPivotType(rtsAtlas.ImageByName(name), engine.PivotBottom)
 	}
 
 	TreeBig = loadSpritePivotBottom("tree_big")
@@ -115,6 +124,10 @@ func LoadSprites(atlasDescriptorPath string) error {
 			components.ClassKing:    {loadSpritePivotBottom("unit_gray_king")},
 		},
 	}
+
+	PanelBrown = engine.NewSpriteFromImage(uiAtlas.ImageByName("panel_brown"))
+	ButtonBeige = engine.NewSpriteFromImage(uiAtlas.ImageByName("buttonSquare_beige"))
+	ButtonBeigePressed = engine.NewSpriteFromImage(uiAtlas.ImageByName("buttonSquare_beige_pressed"))
 
 	return nil
 }
