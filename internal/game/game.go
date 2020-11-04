@@ -3,11 +3,11 @@ package game
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/m110/rts/internal/engine"
-	"github.com/m110/rts/internal/objects"
-	"github.com/m110/rts/internal/systems"
-	"github.com/m110/rts/internal/tiles"
-	"github.com/m110/rts/internal/units"
+	"github.com/m110/moonshot-rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/objects"
+	"github.com/m110/moonshot-rts/internal/systems"
+	"github.com/m110/moonshot-rts/internal/tiles"
+	"github.com/m110/moonshot-rts/internal/units"
 )
 
 type Game struct {

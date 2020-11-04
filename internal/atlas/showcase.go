@@ -3,7 +3,7 @@ package atlas
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/m110/rts/internal/fonts"
+	"github.com/m110/moonshot-rts/internal/fonts"
 	"golang.org/x/image/colornames"
 )
 

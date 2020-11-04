@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/m110/rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/engine"
 )
 
 const AllLayers = 6

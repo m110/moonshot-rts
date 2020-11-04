@@ -1,9 +1,9 @@
 package systems
 
 import (
-	"github.com/m110/rts/internal/objects"
-	"github.com/m110/rts/internal/tiles"
-	"github.com/m110/rts/internal/units"
+	"github.com/m110/moonshot-rts/internal/objects"
+	"github.com/m110/moonshot-rts/internal/tiles"
+	"github.com/m110/moonshot-rts/internal/units"
 )
 
 type spawner interface {

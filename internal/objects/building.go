@@ -1,9 +1,9 @@
 package objects
 
 import (
-	"github.com/m110/rts/internal/atlas"
-	"github.com/m110/rts/internal/components"
-	"github.com/m110/rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/components"
+	"github.com/m110/moonshot-rts/internal/engine"
 )
 
 type BuildingType int

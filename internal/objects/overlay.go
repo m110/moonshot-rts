@@ -2,8 +2,8 @@ package objects
 
 import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/m110/rts/internal/components"
-	"github.com/m110/rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/components"
+	"github.com/m110/moonshot-rts/internal/engine"
 	"golang.org/x/image/colornames"
 )
 

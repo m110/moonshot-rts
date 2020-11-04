@@ -1,4 +1,4 @@
-module github.com/m110/rts
+module github.com/m110/moonshot-rts
 
 go 1.14
 

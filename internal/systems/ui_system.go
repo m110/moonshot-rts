@@ -6,9 +6,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/m110/rts/internal/components"
-	"github.com/m110/rts/internal/engine"
-	"github.com/m110/rts/internal/objects"
+	"github.com/m110/moonshot-rts/internal/components"
+	"github.com/m110/moonshot-rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/objects"
 	"golang.org/x/image/colornames"
 	"golang.org/x/image/font"
 )

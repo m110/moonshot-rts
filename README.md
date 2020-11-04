@@ -1,6 +1,6 @@
 # Moonshot RTS
 
-This is a game in development for Github Game Off 2020. Made in Go with [ebiten](https://github.com/hajimehoshi/ebiten).
+This is a game in development for [Github Game Off 2020](https://itch.io/jam/game-off-2020). Made in Go with [ebiten](https://github.com/hajimehoshi/ebiten).
 
 ## Why Go?
 
@@ -45,3 +45,9 @@ This will possibly change, but right now:
 
 * [Medieval RTS from Kenney](https://kenney.nl/assets/medieval-rts)
 * OpenSans font from Google
+
+## Running
+
+```
+go run ./cmd/rts
+```

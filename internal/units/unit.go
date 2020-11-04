@@ -1,9 +1,9 @@
 package units
 
 import (
-	"github.com/m110/rts/internal/components"
-	"github.com/m110/rts/internal/engine"
-	"github.com/m110/rts/internal/objects"
+	"github.com/m110/moonshot-rts/internal/components"
+	"github.com/m110/moonshot-rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/objects"
 )
 
 type Unit struct {

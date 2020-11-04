@@ -3,8 +3,8 @@ package systems_test
 import (
 	"testing"
 
-	"github.com/m110/rts/internal/engine"
-	"github.com/m110/rts/internal/systems"
+	"github.com/m110/moonshot-rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/systems"
 	"github.com/stretchr/testify/require"
 )
 

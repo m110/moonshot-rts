@@ -3,7 +3,7 @@ package engine_test
 import (
 	"testing"
 
-	"github.com/m110/rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/engine"
 	"github.com/stretchr/testify/require"
 )
 

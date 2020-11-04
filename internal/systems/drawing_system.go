@@ -4,8 +4,8 @@ import (
 	"sort"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/m110/rts/internal/components"
-	"github.com/m110/rts/internal/engine"
+	"github.com/m110/moonshot-rts/internal/components"
+	"github.com/m110/moonshot-rts/internal/engine"
 )
 
 type DrawingEntity interface {

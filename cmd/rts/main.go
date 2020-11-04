@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/m110/rts/internal/atlas"
-	"github.com/m110/rts/internal/fonts"
-	"github.com/m110/rts/internal/game"
-	"github.com/m110/rts/internal/systems"
+	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/fonts"
+	"github.com/m110/moonshot-rts/internal/game"
+	"github.com/m110/moonshot-rts/internal/systems"
 )
 
 func main() {

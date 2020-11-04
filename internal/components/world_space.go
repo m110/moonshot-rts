@@ -1,6 +1,6 @@
 package components
 
-import "github.com/m110/rts/internal/engine"
+import "github.com/m110/moonshot-rts/internal/engine"
 
 type WorldSpaceOwner interface {
 	GetWorldSpace() *WorldSpace

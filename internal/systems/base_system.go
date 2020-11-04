@@ -1,6 +1,6 @@
 package systems
 
-import "github.com/m110/rts/internal/engine"
+import "github.com/m110/moonshot-rts/internal/engine"
 
 type BaseSystem struct {
 	Config   Config
