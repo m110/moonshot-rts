@@ -9,7 +9,7 @@ type Tile struct {
 	*engine.BaseEntity
 	*components.WorldSpace
 	*components.Drawable
-	*components.BoxBoundary
+	*components.Clickable
 }
 
 func (t Tile) GetWorldSpace() *components.WorldSpace {
@@ -20,8 +20,8 @@ func (t Tile) GetDrawable() *components.Drawable {
 	return t.Drawable
 }
 
-func (t Tile) GetBoxBoundary() *components.BoxBoundary {
-	return t.BoxBoundary
+func (t Tile) GetClickable() *components.Clickable {
+	return t.Clickable
 }
 
 type BaseTile struct {

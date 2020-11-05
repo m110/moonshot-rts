@@ -1,11 +1,10 @@
 package systems
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 	"github.com/m110/moonshot-rts/internal/objects"
+	"github.com/m110/moonshot-rts/internal/units"
 )
 
 type buildingControlEntity interface {
@@ -35,24 +34,6 @@ func (b *BuildingControlSystem) Start() {
 }
 
 func (b BuildingControlSystem) Update(dt float64) {
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		if b.activeBuilding != nil {
-			/*
-				// TODO improve this
-				spawner, ok := b.activeBuilding.(components.UnitSpawnerOwner)
-				if !ok {
-					return
-				}
-
-				unit := units.NewUnit(components.TeamBlue, spawner.GetUnitSpawner().Class, atlasSpriteGetter{})
-				b.base.Spawner.SpawnUnit(unit)
-
-				x, y := ebiten.CursorPosition()
-				unit.GetWorldSpace().SetInWorld(float64(x), float64(y))
-
-			*/
-		}
-	}
 }
 
 func (b BuildingControlSystem) Draw(canvas engine.Sprite) {
@@ -79,22 +60,42 @@ func (b *BuildingControlSystem) HandleEvent(e engine.Event) {
 
 func (b *BuildingControlSystem) ShowBuildPanel() {
 	getter := atlasSpriteGetter{}
-	sprites := []engine.Sprite{
-		getter.SpriteForUnit(components.TeamBlue, components.ClassWorker),
-		getter.SpriteForUnit(components.TeamBlue, components.ClassWarrior),
-		getter.SpriteForUnit(components.TeamBlue, components.ClassKnight),
-		getter.SpriteForUnit(components.TeamBlue, components.ClassPriest),
+
+	spawner, ok := b.activeBuilding.(components.UnitSpawnerOwner)
+	if !ok {
+		// TODO Add more building types?
+		return
 	}
-	buildPanel := objects.NewPanel(sprites)
+
+	team := components.TeamBlue
+
+	var configs []objects.ButtonConfig
+	for _, class := range spawner.GetUnitSpawner().Classes {
+		configs = append(configs, objects.ButtonConfig{
+			Sprite: getter.SpriteForUnit(team, class),
+			Action: func() { b.spawnUnit(team, class) },
+		})
+	}
+	buildPanel := objects.NewFourButtonPanel(configs)
 	b.base.Spawner.SpawnPanel(buildPanel)
 
 	pos := b.activeBuilding.GetWorldSpace().WorldPosition()
 	buildPanel.GetWorldSpace().SetInWorld(pos.X, pos.Y)
 
-	// TODO register the button's entity ID as callback for spawning a unit
-	// Buttons need a clickable component which triggers this action
-
 	b.buildPanel = &buildPanel
+}
+
+func (b *BuildingControlSystem) spawnUnit(team components.Team, class components.Class) {
+	// Sanity check, this shouldn't happen
+	if b.activeBuilding == nil {
+		return
+	}
+
+	unit := units.NewUnit(team, class, atlasSpriteGetter{})
+	b.base.Spawner.SpawnUnit(unit)
+
+	pos := b.activeBuilding.GetWorldSpace().WorldPosition()
+	unit.GetWorldSpace().SetInWorld(pos.X, pos.Y)
 }
 
 func (b *BuildingControlSystem) Add(entity buildingControlEntity) {

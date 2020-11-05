@@ -203,7 +203,7 @@ func (t TilemapSystem) Update(_ float64) {
 		x, y := ebiten.CursorPosition()
 		v := engine.Vector{X: float64(x), Y: float64(y)}
 		for _, tile := range t.tiles {
-			bounds := tile.GetBoxBoundary().Bounds
+			bounds := tile.GetClickable().Bounds
 			bounds.Position = bounds.Position.Add(tile.GetWorldSpace().WorldPosition())
 			if bounds.WithinBounds(v) {
 				t.highlightedTile.GetDrawable().Enable()
@@ -220,6 +220,7 @@ func (t *TilemapSystem) HandleEvent(event engine.Event) {
 	switch event.(type) {
 	case EntitySelected:
 		// TODO this probably should be triggered by another event, more specific?
+		// Some event like "Tile selection enabled"?
 		t.tileSelectionMode = true
 	case EntityUnselected:
 		t.tileSelectionMode = false

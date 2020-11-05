@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	OpenSansRegular font.Face
+	OpenSansRegular      font.Face
+	OpenSansRegularSmall font.Face
 )
 
 func LoadFonts() error {
@@ -34,7 +35,16 @@ func LoadFonts() error {
 		return err
 	}
 
+	smallFace, err := opentype.NewFace(font, &opentype.FaceOptions{
+		Size: 14,
+		DPI:  70,
+	})
+	if err != nil {
+		return err
+	}
+
 	OpenSansRegular = face
+	OpenSansRegularSmall = smallFace
 
 	return nil
 }

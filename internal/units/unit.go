@@ -13,7 +13,7 @@ type Unit struct {
 	*components.Drawable
 	*components.Movable
 	*components.Selectable
-	*components.BoxBoundary
+	*components.Clickable
 }
 
 func (u Unit) GetWorldSpace() *components.WorldSpace {
@@ -32,8 +32,8 @@ func (u Unit) GetMovable() *components.Movable {
 	return u.Movable
 }
 
-func (u Unit) GetBoxBoundary() *components.BoxBoundary {
-	return u.BoxBoundary
+func (u Unit) GetClickable() *components.Clickable {
+	return u.Clickable
 }
 
 type spriteGetter interface {
@@ -58,10 +58,12 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 		},
 		&components.Movable{},
 		&components.Selectable{
-			GroupSelectable: true,
-			Overlay:         overlay,
+			Overlay: overlay,
 		},
-		components.BoxBoundaryFromSprite(sprite),
+		&components.Clickable{
+			Bounds:    components.BoundsFromSprite(sprite),
+			ByOverlay: true,
+		},
 	}
 
 	u.GetWorldSpace().AddChild(u, overlay)

@@ -13,5 +13,7 @@ type spawner interface {
 	SpawnObject(object objects.Object)
 	SpawnPanel(panel objects.Panel)
 	RemovePanel(panel objects.Panel)
+	SpawnPanelButton(panel objects.PanelButton)
+	RemovePanelButton(panel objects.PanelButton)
 	SpawnDrawingEntity(entity DrawingEntity)
 }

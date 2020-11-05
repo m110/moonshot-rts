@@ -2,7 +2,7 @@ package components
 
 import "github.com/m110/moonshot-rts/internal/engine"
 
-const AllLayers = 7
+const AllLayers = 8
 
 type DrawingLayer int
 
@@ -13,6 +13,7 @@ const (
 	LayerUnits
 	LayerForeground
 	LayerUI
+	LayerUIPanel
 	LayerUIButton
 )
 

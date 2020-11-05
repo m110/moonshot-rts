@@ -1,6 +1,7 @@
 package atlas
 
 import (
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -32,9 +33,15 @@ var (
 
 	Units = map[components.Team]map[components.Class]engine.Sprites{}
 
-	PanelBrown         engine.Sprite
+	PanelBrown engine.Sprite
+
 	ButtonBeige        engine.Sprite
 	ButtonBeigePressed engine.Sprite
+
+	ButtonBrown        engine.Sprite
+	ButtonBrownPressed engine.Sprite
+
+	Hammer engine.Sprite
 )
 
 type TeamSprites struct {
@@ -126,8 +133,18 @@ func LoadSprites(rtsPath string, uiPath string) error {
 	}
 
 	PanelBrown = engine.NewSpriteFromImage(uiAtlas.ImageByName("panel_brown"))
+
 	ButtonBeige = engine.NewSpriteFromImage(uiAtlas.ImageByName("buttonSquare_beige"))
 	ButtonBeigePressed = engine.NewSpriteFromImage(uiAtlas.ImageByName("buttonSquare_beige_pressed"))
+
+	ButtonBrown = engine.NewSpriteFromImage(uiAtlas.ImageByName("buttonSquare_brown"))
+	ButtonBrownPressed = engine.NewSpriteFromImage(uiAtlas.ImageByName("buttonSquare_brown_pressed"))
+
+	hammerImg, _, err := ebitenutil.NewImageFromFile("assets/hammer.png")
+	if err != nil {
+		return err
+	}
+	Hammer = engine.NewSpriteFromImage(hammerImg)
 
 	return nil
 }

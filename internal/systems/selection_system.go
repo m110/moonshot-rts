@@ -1,20 +1,17 @@
 package systems
 
 import (
-	"math"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
 )
 
 type selectionEntity interface {
 	engine.Entity
 	components.WorldSpaceOwner
 	components.SelectableOwner
-	components.BoxBoundaryOwner
+	components.ClickableOwner
 }
 
 type SelectionSystem struct {
@@ -23,10 +20,6 @@ type SelectionSystem struct {
 	entities EntityList
 
 	selectedEntities []selectionEntity
-
-	overlay        objects.Overlay
-	overlayAnchor  engine.Vector
-	overlayEnabled bool
 }
 
 type EntitySelected struct {
@@ -44,110 +37,68 @@ func NewSelectionSystem(config Config, eventBus *engine.EventBus, spawner spawne
 }
 
 func (s *SelectionSystem) Start() {
-	s.overlay = objects.NewOverlay(0, 0, engine.PivotTopLeft)
-	s.overlay.GetDrawable().Disable()
-	s.base.Spawner.SpawnDrawingEntity(s.overlay)
+	s.base.EventBus.Subscribe(EntityClicked{}, s)
+	s.base.EventBus.Subscribe(EntitiesClicked{}, s)
+	s.base.EventBus.Subscribe(PointClicked{}, s)
 }
 
 func (s *SelectionSystem) Update(dt float64) {
-	cx, cy := ebiten.CursorPosition()
-	cursorX := float64(cx)
-	cursorY := float64(cy)
-
-	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
-		if s.overlayEnabled {
-			s.hideOverlay()
-			r := engine.Rect{
-				Position: s.overlay.WorldSpace.WorldPosition(),
-				Width:    float64(s.overlay.GetSize().Width),
-				Height:   float64(s.overlay.GetSize().Height),
-			}
-			for _, e := range s.entities.All() {
-				entity := e.(selectionEntity)
-				bounds := entity.GetBoxBoundary().Bounds
-				bounds.Position = bounds.Position.Add(entity.GetWorldSpace().WorldPosition())
-				if bounds.Intersects(r) && entity.GetSelectable().GroupSelectable {
-					entity.GetSelectable().Select()
-					s.selectedEntities = append(s.selectedEntities, entity)
-
-					s.base.EventBus.Publish(EntitySelected{
-						Entity: entity,
-					})
-				} else {
-					entity.GetSelectable().Unselect()
-				}
-			}
-		}
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+		s.unselectCurrentEntities()
 	}
+}
 
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+func (s *SelectionSystem) HandleEvent(e engine.Event) {
+	switch event := e.(type) {
+	case EntityClicked:
 		if len(s.selectedEntities) > 0 {
-			for _, e := range s.selectedEntities {
-				e.GetSelectable().Unselect()
-				s.base.EventBus.Publish(EntityUnselected{Entity: e})
-			}
-			s.selectedEntities = nil
-		} else {
-			v := engine.Vector{X: cursorX, Y: cursorY}
-			for _, e := range s.entities.All() {
-				entity := e.(selectionEntity)
-				bounds := entity.GetBoxBoundary().Bounds
-				bounds.Position = bounds.Position.Add(entity.GetWorldSpace().WorldPosition())
-				if len(s.selectedEntities) == 0 && bounds.WithinBounds(v) {
-					entity.GetSelectable().Select()
-					s.selectedEntities = append(s.selectedEntities, entity)
-
-					s.base.EventBus.Publish(EntitySelected{
-						Entity: entity,
-					})
-				} else {
-					entity.GetSelectable().Unselect()
-				}
-			}
-
-			if len(s.selectedEntities) == 0 {
-				s.showOverlay(cursorX, cursorY)
+			_, ok := s.entities.ByID(event.Entity.ID())
+			if ok {
+				s.unselectCurrentEntities()
+				return
 			}
 		}
-	}
+		s.selectEntity(event.Entity)
+	case EntitiesClicked:
+		if len(s.selectedEntities) > 0 {
+			s.unselectCurrentEntities()
+			return
+		}
 
-	if s.overlayEnabled {
-		s.updateOverlay(cursorX, cursorY)
+		for _, entity := range event.Entities {
+			s.selectEntity(entity)
+		}
+	case PointClicked:
+		s.unselectCurrentEntities()
 	}
 }
-
-func (s *SelectionSystem) showOverlay(x float64, y float64) {
-	s.overlayAnchor = engine.Vector{X: x, Y: y}
-	s.overlay.GetWorldSpace().SetInWorld(x, y)
-	s.overlay.GetDrawable().Enable()
-	s.overlayEnabled = true
-}
-
-func (s *SelectionSystem) updateOverlay(x float64, y float64) {
-	var pos engine.Vector
-
-	switch {
-	case x < s.overlayAnchor.X && y < s.overlayAnchor.Y:
-		pos = engine.Vector{X: x, Y: y}
-	case x < s.overlayAnchor.X && y > s.overlayAnchor.Y:
-		pos = engine.Vector{X: x, Y: s.overlayAnchor.Y}
-	case x > s.overlayAnchor.X && y < s.overlayAnchor.Y:
-		pos = engine.Vector{X: s.overlayAnchor.X, Y: y}
-	default:
-		pos = engine.Vector{X: s.overlayAnchor.X, Y: s.overlayAnchor.Y}
+func (s *SelectionSystem) selectEntity(e engine.Entity) bool {
+	_, ok := s.entities.ByID(e.ID())
+	if !ok {
+		return false
 	}
 
-	s.overlay.WorldSpace.SetInWorld(pos.X, pos.Y)
-	s.overlay.Size.Set(
-		int(math.Abs(x-s.overlayAnchor.X)),
-		int(math.Abs(y-s.overlayAnchor.Y)),
-	)
-	s.overlay.Drawable.Sprite = objects.NewRectangleSprite(s.overlay, engine.PivotTopLeft)
+	entity := e.(selectionEntity)
+	entity.GetSelectable().Select()
+	s.selectedEntities = append(s.selectedEntities, entity)
+
+	s.base.EventBus.Publish(EntitySelected{
+		Entity: entity,
+	})
+
+	return true
 }
 
-func (s *SelectionSystem) hideOverlay() {
-	s.overlayEnabled = false
-	s.overlay.Drawable.Disable()
+func (s *SelectionSystem) unselectCurrentEntities() {
+	if len(s.selectedEntities) == 0 {
+		return
+	}
+
+	for _, e := range s.selectedEntities {
+		e.GetSelectable().Unselect()
+		s.base.EventBus.Publish(EntityUnselected{Entity: e})
+	}
+	s.selectedEntities = nil
 }
 
 func (s SelectionSystem) Draw(canvas engine.Sprite) {

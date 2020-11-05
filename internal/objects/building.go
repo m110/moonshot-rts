@@ -24,23 +24,23 @@ const (
 type Building struct {
 	Object
 	*components.Selectable
-	*components.BoxBoundary
+	*components.Clickable
 	*components.UnitSpawner
 }
 
 func NewBuilding(position engine.Vector, buildingType BuildingType) Building {
 	var bottomSprite, topSprite engine.Sprite
-	var class components.Class
+	var classes []components.Class
 
 	switch buildingType {
 	case BuildingSettlement:
 		bottomSprite = atlas.Castle
 		topSprite = atlas.CastleTop
-		class = components.ClassWorker
+		classes = []components.Class{components.ClassWorker}
 	case BuildingBarracks:
 		bottomSprite = atlas.Barracks
 		topSprite = atlas.BarracksTop
-		class = components.ClassWarrior
+		classes = []components.Class{components.ClassWarrior, components.ClassKnight}
 	}
 
 	w, h := bottomSprite.Size()
@@ -54,9 +54,11 @@ func NewBuilding(position engine.Vector, buildingType BuildingType) Building {
 		Selectable: &components.Selectable{
 			Overlay: overlay,
 		},
-		BoxBoundary: components.BoxBoundaryFromSprite(bottomSprite),
+		Clickable: &components.Clickable{
+			Bounds: components.BoundsFromSprite(bottomSprite),
+		},
 		UnitSpawner: &components.UnitSpawner{
-			Class: class,
+			Classes: classes,
 		},
 	}
 
@@ -76,8 +78,8 @@ func (b Building) GetSelectable() *components.Selectable {
 	return b.Selectable
 }
 
-func (b Building) GetBoxBoundary() *components.BoxBoundary {
-	return b.BoxBoundary
+func (b Building) GetClickable() *components.Clickable {
+	return b.Clickable
 }
 
 func (b Building) GetUnitSpawner() *components.UnitSpawner {

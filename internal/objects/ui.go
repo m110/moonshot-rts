@@ -8,21 +8,30 @@ import (
 
 type Panel struct {
 	Object
+	*components.Clickable
 
-	buttons []Button
+	buttons []PanelButton
 }
 
-func NewPanel(sprites []engine.Sprite) Panel {
+type ButtonConfig struct {
+	Sprite engine.Sprite
+	Action func()
+}
+
+func NewFourButtonPanel(buttonConfigs []ButtonConfig) Panel {
 	p := Panel{
-		Object: NewObject(atlas.PanelBrown, components.LayerUI),
+		Object: NewObject(atlas.PanelBrown, components.LayerUIPanel),
 	}
 
 	p.Drawable.Sprite.Scale(engine.Vector{X: 1.5, Y: 1.5})
+	p.Clickable = &components.Clickable{
+		Bounds: components.BoundsFromSprite(p.Drawable.Sprite),
+	}
 
 	x := 20
 	y := 15
-	for i, s := range sprites {
-		b := NewButton(s)
+	for i, s := range buttonConfigs {
+		b := NewPanelButton(components.UIColorBeige, s.Sprite, s.Action)
 		p.buttons = append(p.buttons, b)
 		p.WorldSpace.AddChild(p, b)
 		b.WorldSpace.Translate(float64(x), float64(y))
@@ -38,51 +47,51 @@ func NewPanel(sprites []engine.Sprite) Panel {
 	return p
 }
 
-type Button struct {
-	Object
-
-	pressed bool
-
-	spriteTop      engine.Sprite
-	spriteReleased engine.Sprite
-	spritePressed  engine.Sprite
+func (p Panel) GetClickable() *components.Clickable {
+	return p.Clickable
 }
 
-func NewButton(spriteTop engine.Sprite) Button {
-	b := Button{
-		Object:         NewObject(engine.Sprite{}, components.LayerUIButton),
-		spriteTop:      spriteTop,
-		spriteReleased: atlas.ButtonBeige,
-		spritePressed:  atlas.ButtonBeigePressed,
+type PanelButton struct {
+	Object
+	*components.Clickable
+	*components.Button
+}
+
+func NewPanelButton(color components.UIColor, spriteTop engine.Sprite, action func()) PanelButton {
+	spriteTop.SetPivot(engine.NewPivotForSprite(spriteTop, engine.PivotCenter))
+
+	var spriteReleased, spritePressed engine.Sprite
+	switch color {
+	case components.UIColorBeige:
+		spriteReleased = atlas.ButtonBeige
+		spritePressed = atlas.ButtonBeigePressed
+	case components.UIColorBrown:
+		spriteReleased = atlas.ButtonBrown
+		spritePressed = atlas.ButtonBrownPressed
 	}
 
-	b.spriteTop.SetPivot(engine.NewPivotForSprite(b.spriteTop, engine.PivotCenter))
-	b.updateSprite()
+	b := PanelButton{
+		Object: NewObject(engine.Sprite{}, components.LayerUIButton),
+		Button: &components.Button{
+			Action:         action,
+			Pressed:        false,
+			SpriteTop:      spriteTop,
+			SpriteReleased: spriteReleased,
+			SpritePressed:  spritePressed,
+		},
+	}
+
+	b.Clickable = &components.Clickable{
+		Bounds: components.BoundsFromSprite(b.Button.SpriteReleased),
+	}
 
 	return b
 }
 
-func (b *Button) Press() {
-	b.pressed = true
-	b.updateSprite()
+func (b PanelButton) GetClickable() *components.Clickable {
+	return b.Clickable
 }
 
-func (b *Button) Release() {
-	b.pressed = false
-	b.updateSprite()
-}
-
-func (b *Button) updateSprite() {
-	var baseSprite engine.Sprite
-	if b.pressed {
-		baseSprite = b.spritePressed
-	} else {
-		baseSprite = b.spriteReleased
-	}
-
-	sprite := engine.NewBlankSprite(baseSprite.Size())
-	sprite.Draw(baseSprite)
-	sprite.DrawAtPosition(b.spriteTop, baseSprite.Width()/2, baseSprite.Height()/2)
-
-	b.Drawable.Sprite = sprite
+func (b PanelButton) GetButton() *components.Button {
+	return b.Button
 }

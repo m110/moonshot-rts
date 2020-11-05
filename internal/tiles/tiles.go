@@ -35,7 +35,9 @@ func NewGroundTile(groundType GroundType) Tile {
 			Sprite: sprite,
 			Layer:  components.LayerGround,
 		},
-		BoxBoundary: components.BoxBoundaryFromSprite(sprite),
+		Clickable: &components.Clickable{
+			Bounds: components.BoundsFromSprite(sprite),
+		},
 	}
 }
 
@@ -87,8 +89,8 @@ func forestToTripType(forestType ForestType) objects.TreeType {
 func NewMountainsTile(groundType GroundType, mountainType objects.MountainType) Tile {
 	t := NewGroundTile(groundType)
 
-	width := int(t.BoxBoundary.Bounds.Width)
-	height := int(t.BoxBoundary.Bounds.Height)
+	width := int(t.Clickable.Bounds.Width)
+	height := int(t.Clickable.Bounds.Height)
 	widthOffset := width / 4.0
 	heightOffset := height / 4.0
 
@@ -106,14 +108,14 @@ func NewBuildingTile(groundType GroundType, buildingType objects.BuildingType) T
 	t := NewGroundTile(groundType)
 
 	buildingPos := engine.Vector{
-		X: t.BoxBoundary.Bounds.Width / 2.0,
-		Y: t.BoxBoundary.Bounds.Height,
+		X: t.Clickable.Bounds.Width / 2.0,
+		Y: t.Clickable.Bounds.Height,
 	}
 
 	building := objects.NewBuilding(buildingPos, buildingType)
 
 	buildingHeight := float64(building.Sprite.Height())
-	height := t.BoxBoundary.Bounds.Height
+	height := t.Clickable.Bounds.Height
 
 	// TODO This is a hack, but probably good enough for now
 	if buildingHeight > height {

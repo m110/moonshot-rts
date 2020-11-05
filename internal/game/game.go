@@ -49,6 +49,8 @@ func (g *Game) Start() {
 		systems.NewResourcesSystem(g.config, g.eventBus, g),
 		systems.NewUnitControlSystem(g.config, g.eventBus, g),
 		systems.NewBuildingControlSystem(g.config, g.eventBus, g),
+		systems.NewClickingSystem(g.config, g.eventBus, g),
+		systems.NewButtonsSystem(g.config, g.eventBus, g),
 	}
 
 	for _, s := range g.systems {
@@ -122,6 +124,8 @@ func (g *Game) SpawnBuilding(building objects.Building) {
 			system.Add(building)
 		case *systems.BuildingControlSystem:
 			system.Add(building)
+		case *systems.ClickingSystem:
+			system.Add(building)
 		}
 	}
 }
@@ -140,6 +144,8 @@ func (g *Game) SpawnUnit(unit units.Unit) {
 		case *systems.SelectionSystem:
 			system.Add(unit)
 		case *systems.UnitControlSystem:
+			system.Add(unit)
+		case *systems.ClickingSystem:
 			system.Add(unit)
 		}
 	}
@@ -165,12 +171,15 @@ func (g *Game) SpawnPanel(panel objects.Panel) {
 		switch system := s.(type) {
 		case *systems.DrawingSystem:
 			system.Add(panel)
-			for _, c := range panel.GetWorldSpace().Children {
-				d, ok := c.(systems.DrawingEntity)
-				if ok {
-					system.Add(d)
-				}
-			}
+		case *systems.ClickingSystem:
+			system.Add(panel)
+		}
+	}
+
+	for _, c := range panel.GetWorldSpace().Children {
+		b, ok := c.(objects.PanelButton)
+		if ok {
+			g.SpawnPanelButton(b)
 		}
 	}
 }
@@ -180,12 +189,41 @@ func (g *Game) RemovePanel(panel objects.Panel) {
 		switch system := s.(type) {
 		case *systems.DrawingSystem:
 			system.Remove(panel)
-			for _, c := range panel.GetWorldSpace().Children {
-				d, ok := c.(systems.DrawingEntity)
-				if ok {
-					system.Remove(d)
-				}
-			}
+		case *systems.ClickingSystem:
+			system.Remove(panel)
+		}
+	}
+
+	for _, c := range panel.GetWorldSpace().Children {
+		b, ok := c.(objects.PanelButton)
+		if ok {
+			g.RemovePanelButton(b)
+		}
+	}
+}
+
+func (g *Game) SpawnPanelButton(button objects.PanelButton) {
+	for _, s := range g.systems {
+		switch system := s.(type) {
+		case *systems.DrawingSystem:
+			system.Add(button)
+		case *systems.ClickingSystem:
+			system.Add(button)
+		case *systems.ButtonsSystem:
+			system.Add(button)
+		}
+	}
+}
+
+func (g *Game) RemovePanelButton(button objects.PanelButton) {
+	for _, s := range g.systems {
+		switch system := s.(type) {
+		case *systems.DrawingSystem:
+			system.Remove(button)
+		case *systems.ClickingSystem:
+			system.Remove(button)
+		case *systems.ButtonsSystem:
+			system.Remove(button)
 		}
 	}
 }

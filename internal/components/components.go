@@ -4,40 +4,13 @@ import (
 	"github.com/m110/moonshot-rts/internal/engine"
 )
 
-type BoxBoundaryOwner interface {
-	GetBoxBoundary() *BoxBoundary
-}
-
-type BoxBoundary struct {
-	// Bounds defines position relative to WorldSpace
-	Bounds engine.Rect
-}
-
-func BoxBoundaryFromSprite(sprite engine.Sprite) *BoxBoundary {
-	w, h := sprite.Size()
-	pivot := sprite.Pivot()
-	bounds := engine.Rect{
-		Position: engine.Vector{
-			X: -pivot.X,
-			Y: -pivot.Y,
-		},
-		Width:  float64(w),
-		Height: float64(h),
-	}
-
-	return &BoxBoundary{
-		Bounds: bounds,
-	}
-}
-
 type SelectableOwner interface {
 	GetSelectable() *Selectable
 }
 
 type Selectable struct {
-	Selected        bool
-	GroupSelectable bool
-	Overlay         DrawableOwner
+	Selected bool
+	Overlay  DrawableOwner
 }
 
 func (s *Selectable) Select() {
@@ -86,11 +59,14 @@ type SizeOwner interface {
 }
 
 type UnitSpawner struct {
-	Class Class
+	Classes []Class
 }
 
 type UnitSpawnerOwner interface {
 	GetUnitSpawner() *UnitSpawner
+}
+
+type Builder struct {
 }
 
 type Team int
