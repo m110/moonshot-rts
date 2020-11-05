@@ -104,7 +104,7 @@ func NewMountainsTile(groundType GroundType, mountainType objects.MountainType) 
 	return t
 }
 
-func NewBuildingTile(groundType GroundType, buildingType objects.BuildingType) Tile {
+func NewBuildingTile(groundType GroundType, buildingType components.BuildingType) Tile {
 	t := NewGroundTile(groundType)
 
 	buildingPos := engine.Vector{
@@ -113,17 +113,6 @@ func NewBuildingTile(groundType GroundType, buildingType objects.BuildingType) T
 	}
 
 	building := objects.NewBuilding(buildingPos, buildingType)
-
-	buildingHeight := float64(building.Sprite.Height())
-	height := t.Clickable.Bounds.Height
-
-	// TODO This is a hack, but probably good enough for now
-	if buildingHeight > height {
-		p := building.Sprite.Pivot()
-		p.Y += (buildingHeight - height) / 2.0
-		building.Sprite.SetPivot(p)
-	}
-
 	t.GetWorldSpace().AddChild(t, building)
 
 	return t

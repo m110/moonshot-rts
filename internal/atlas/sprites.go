@@ -11,6 +11,11 @@ var (
 	Sand1  engine.Sprite
 	Water1 engine.Sprite
 
+	FieldSmallEmpty engine.Sprite
+	FieldSmallWheat engine.Sprite
+	FieldBigEmpty   engine.Sprite
+	FieldBigWheat   engine.Sprite
+
 	TreeBig   engine.Sprite
 	TreeSmall engine.Sprite
 	PineBig   engine.Sprite
@@ -30,6 +35,14 @@ var (
 
 	Barracks    engine.Sprite
 	BarracksTop engine.Sprite
+
+	Chapel    engine.Sprite
+	ChapelTop engine.Sprite
+
+	Tower    engine.Sprite
+	TowerTop engine.Sprite
+
+	Forge engine.Sprite
 
 	Units = map[components.Team]map[components.Class]engine.Sprites{}
 
@@ -66,6 +79,11 @@ func LoadSprites(rtsPath string, uiPath string) error {
 	Sand1 = engine.NewSpriteFromImage(rtsAtlas.ImageByName("sand_1"))
 	Water1 = engine.NewSpriteFromImage(rtsAtlas.ImageByName("water_1"))
 
+	FieldSmallEmpty = engine.NewSpriteFromImage(rtsAtlas.ImageByName("grass_field_small_empty"))
+	FieldSmallWheat = engine.NewSpriteFromImage(rtsAtlas.ImageByName("grass_field_small_wheat"))
+	FieldBigEmpty = engine.NewSpriteFromImage(rtsAtlas.ImageByName("grass_field_big_empty"))
+	FieldBigWheat = engine.NewSpriteFromImage(rtsAtlas.ImageByName("grass_field_big_wheat"))
+
 	loadSpritePivotBottom := func(name string) engine.Sprite {
 		return engine.NewSpriteFromImageWithPivotType(rtsAtlas.ImageByName(name), engine.PivotBottom)
 	}
@@ -88,6 +106,14 @@ func LoadSprites(rtsPath string, uiPath string) error {
 
 	Barracks = loadSpritePivotBottom("barracks")
 	BarracksTop = loadSpritePivotBottom("barracks_top")
+
+	Chapel = loadSpritePivotBottom("chapel")
+	ChapelTop = loadSpritePivotBottom("chapel_top")
+
+	Tower = loadSpritePivotBottom("tower")
+	TowerTop = loadSpritePivotBottom("tower_top")
+
+	Forge = loadSpritePivotBottom("forge")
 
 	Units = map[components.Team]map[components.Class]engine.Sprites{
 		components.TeamBlue: {

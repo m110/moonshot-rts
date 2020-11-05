@@ -120,9 +120,7 @@ func (t *TilemapSystem) spawnTiles() {
 
 			var tile tiles.Tile
 			if x == t.castlePosition.X && y == t.castlePosition.Y {
-				tile = tiles.NewBuildingTile(ground, objects.BuildingSettlement)
-			} else if x == t.castlePosition.X-1 && y == t.castlePosition.Y-1 {
-				tile = tiles.NewBuildingTile(ground, objects.BuildingBarracks)
+				tile = tiles.NewBuildingTile(ground, components.BuildingSettlement)
 			} else {
 				if rand.Intn(10) < forestChance {
 					forestType := tiles.ForestType(rand.Intn(3))
@@ -172,18 +170,6 @@ func (t TilemapSystem) spawnUnits() {
 	}
 
 	spriteGetter := atlasSpriteGetter{}
-
-	workerA := units.NewUnit(components.TeamBlue, components.ClassWorker, spriteGetter)
-	workerB := units.NewUnit(components.TeamBlue, components.ClassWorker, spriteGetter)
-
-	t.world.GetWorldSpace().AddChild(t.world, workerA)
-	t.world.GetWorldSpace().AddChild(t.world, workerB)
-
-	workerA.GetWorldSpace().Translate(unitsX(1), unitsY(0))
-	workerB.GetWorldSpace().Translate(unitsX(-1), unitsY(0))
-
-	t.base.Spawner.SpawnUnit(workerA)
-	t.base.Spawner.SpawnUnit(workerB)
 
 	king := units.NewUnit(components.TeamBlue, components.ClassKing, spriteGetter)
 	t.world.GetWorldSpace().AddChild(t.world, king)

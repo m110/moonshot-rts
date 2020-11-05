@@ -11,6 +11,7 @@ type unitControlEntity interface {
 	engine.Entity
 	components.WorldSpaceOwner
 	components.MovableOwner
+	components.BuilderOwner
 }
 
 type UnitControlSystem struct {
@@ -20,9 +21,17 @@ type UnitControlSystem struct {
 
 	activeEntities EntityList
 
+	buildMode           bool
+	buildingToBuild     components.BuildingType
+	buildingsInProgress map[engine.EntityID]components.BuildingType
+
 	buildIcon    engine.Sprite
 	actionButton *objects.PanelButton
 	actionsPanel *objects.Panel
+}
+
+type EntityReachedTarget struct {
+	Entity engine.Entity
 }
 
 func NewUnitControlSystem(config Config, eventBus *engine.EventBus, spawner spawner) *UnitControlSystem {
@@ -32,12 +41,16 @@ func NewUnitControlSystem(config Config, eventBus *engine.EventBus, spawner spaw
 }
 
 func (u *UnitControlSystem) Start() {
+	u.buildMode = false
+	u.buildingsInProgress = map[engine.EntityID]components.BuildingType{}
+
 	u.buildIcon = atlas.Hammer
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
 	u.base.EventBus.Subscribe(PointClicked{}, u)
 	u.base.EventBus.Subscribe(EntitySelected{}, u)
 	u.base.EventBus.Subscribe(EntityUnselected{}, u)
+	u.base.EventBus.Subscribe(EntityReachedTarget{}, u)
 }
 
 func (u UnitControlSystem) Update(dt float64) {
@@ -66,7 +79,31 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 		for _, e := range u.activeEntities.All() {
 			entity := e.(unitControlEntity)
 			entity.GetMovable().SetTarget(event.Point)
+
+			if u.buildMode {
+				u.buildingsInProgress[entity.ID()] = u.buildingToBuild
+				u.buildMode = false
+			}
 		}
+	case EntityReachedTarget:
+		buildingType, ok := u.buildingsInProgress[event.Entity.ID()]
+		if !ok {
+			return
+		}
+		entity, ok := u.entities.ByID(event.Entity.ID())
+		if !ok {
+			return
+		}
+
+		// TODO this should be based on tiles
+		uce := entity.(unitControlEntity)
+		pos := uce.GetWorldSpace().WorldPosition()
+		pos.Translate(0, -24)
+
+		building := objects.NewBuilding(pos, buildingType)
+		u.base.Spawner.SpawnBuilding(building)
+
+		delete(u.buildingsInProgress, event.Entity.ID())
 	}
 }
 
@@ -75,6 +112,7 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 		entity := e.(unitControlEntity)
 		if entity.GetMovable().Target != nil {
 			if entity.GetWorldSpace().WorldPosition().Distance(*entity.GetMovable().Target) < 1.0 {
+				u.base.EventBus.Publish(EntityReachedTarget{Entity: entity})
 				entity.GetMovable().ClearTarget()
 			} else {
 				direction := entity.GetMovable().Target.Sub(entity.GetWorldSpace().WorldPosition()).Normalized()
@@ -85,12 +123,16 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 }
 
 func (u *UnitControlSystem) showActionButton() {
+	entity := u.activeEntities.All()[0].(unitControlEntity)
+	if len(entity.GetBuilder().Buildings) == 0 {
+		return
+	}
+
 	button := objects.NewPanelButton(components.UIColorBrown, u.buildIcon, func() {
 		u.hideActionButton()
 		u.showActionPanel()
 	})
 
-	entity := u.activeEntities.All()[0].(unitControlEntity)
 	entity.GetWorldSpace().AddChild(entity, button)
 
 	u.base.Spawner.SpawnPanelButton(button)
@@ -107,17 +149,28 @@ func (u *UnitControlSystem) hideActionButton() {
 }
 
 func (u *UnitControlSystem) showActionPanel() {
+	entity := u.activeEntities.All()[0].(unitControlEntity)
+	buildings := entity.GetBuilder().Buildings
+
 	var configs []objects.ButtonConfig
-	/*
-		for _, class := range spawner.GetUnitSpawner().Classes {
-			configs = append(configs, objects.ButtonConfig{})
-		}
-	*/
+	for i := range buildings {
+		b := buildings[i]
+		sprite := objects.SpriteForBuilding(b)
+		sprite.Scale(engine.Vector{X: 0.5, Y: 0.5})
+
+		configs = append(configs, objects.ButtonConfig{
+			Sprite: sprite,
+			Action: func() {
+				u.buildMode = true
+				u.buildingToBuild = b
+				u.hideActionsPanel()
+			},
+		})
+	}
 
 	panel := objects.NewFourButtonPanel(configs)
 	u.base.Spawner.SpawnPanel(panel)
 
-	entity := u.activeEntities.All()[0].(unitControlEntity)
 	entity.GetWorldSpace().AddChild(entity, panel)
 
 	u.actionsPanel = &panel

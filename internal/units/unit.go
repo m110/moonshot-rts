@@ -14,6 +14,7 @@ type Unit struct {
 	*components.Movable
 	*components.Selectable
 	*components.Clickable
+	*components.Builder
 }
 
 func (u Unit) GetWorldSpace() *components.WorldSpace {
@@ -36,6 +37,10 @@ func (u Unit) GetClickable() *components.Clickable {
 	return u.Clickable
 }
 
+func (u Unit) GetBuilder() *components.Builder {
+	return u.Builder
+}
+
 type spriteGetter interface {
 	SpriteForUnit(components.Team, components.Class) engine.Sprite
 }
@@ -44,6 +49,17 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 	sprite := spriteGetter.SpriteForUnit(team, class)
 	w, h := sprite.Size()
 	overlay := objects.NewOverlay(w+20, h+20, engine.PivotBottom)
+
+	var buildings []components.BuildingType
+	switch class {
+	case components.ClassWorker:
+		buildings = []components.BuildingType{
+			components.BuildingBarracks,
+			components.BuildingForge,
+			components.BuildingChapel,
+			components.BuildingTower,
+		}
+	}
 
 	u := Unit{
 		engine.NewBaseEntity(),
@@ -63,6 +79,9 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 		&components.Clickable{
 			Bounds:    components.BoundsFromSprite(sprite),
 			ByOverlay: true,
+		},
+		&components.Builder{
+			Buildings: buildings,
 		},
 	}
 

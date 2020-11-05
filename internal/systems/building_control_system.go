@@ -20,6 +20,8 @@ type BuildingControlSystem struct {
 	activeBuilding buildingControlEntity
 
 	buildPanel *objects.Panel
+
+	spawnedUnits []units.Unit
 }
 
 func NewBuildingControlSystem(config Config, eventBus *engine.EventBus, spawner spawner) *BuildingControlSystem {
@@ -33,7 +35,17 @@ func (b *BuildingControlSystem) Start() {
 	b.base.EventBus.Subscribe(EntityUnselected{}, b)
 }
 
-func (b BuildingControlSystem) Update(dt float64) {
+func (b *BuildingControlSystem) Update(dt float64) {
+	// TODO Rework this (with events?)
+	units := b.spawnedUnits
+	b.spawnedUnits = nil
+	for _, u := range units {
+		if u.Target == nil {
+			u.Clickable.Enable()
+		} else {
+			b.spawnedUnits = append(b.spawnedUnits, u)
+		}
+	}
 }
 
 func (b BuildingControlSystem) Draw(canvas engine.Sprite) {
@@ -70,7 +82,8 @@ func (b *BuildingControlSystem) ShowBuildPanel() {
 	team := components.TeamBlue
 
 	var configs []objects.ButtonConfig
-	for _, class := range spawner.GetUnitSpawner().Classes {
+	for i := range spawner.GetUnitSpawner().Classes {
+		class := spawner.GetUnitSpawner().Classes[i]
 		configs = append(configs, objects.ButtonConfig{
 			Sprite: getter.SpriteForUnit(team, class),
 			Action: func() { b.spawnUnit(team, class) },
@@ -96,6 +109,16 @@ func (b *BuildingControlSystem) spawnUnit(team components.Team, class components
 
 	pos := b.activeBuilding.GetWorldSpace().WorldPosition()
 	unit.GetWorldSpace().SetInWorld(pos.X, pos.Y)
+
+	// TODO This should be based on tiles, not absolute position
+	target := pos
+	target.Translate(
+		float64(engine.RandomRange(-32, 32)),
+		float64(engine.RandomRange(12, 32)),
+	)
+	unit.Clickable.Disable()
+	unit.GetMovable().SetTarget(target)
+	b.spawnedUnits = append(b.spawnedUnits, unit)
 }
 
 func (b *BuildingControlSystem) Add(entity buildingControlEntity) {

@@ -4,21 +4,7 @@ import (
 	"github.com/m110/moonshot-rts/internal/atlas"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-)
-
-type BuildingType int
-
-const (
-	BuildingSettlement BuildingType = iota
-	BuildingBarracks
-)
-
-type SettlementType int
-
-const (
-	SettlementColony SettlementType = iota
-	SettlementVillage
-	SettlementCastle
+	"golang.org/x/image/colornames"
 )
 
 type Building struct {
@@ -28,20 +14,18 @@ type Building struct {
 	*components.UnitSpawner
 }
 
-func NewBuilding(position engine.Vector, buildingType BuildingType) Building {
-	var bottomSprite, topSprite engine.Sprite
+func NewBuilding(position engine.Vector, buildingType components.BuildingType) Building {
 	var classes []components.Class
-
 	switch buildingType {
-	case BuildingSettlement:
-		bottomSprite = atlas.Castle
-		topSprite = atlas.CastleTop
+	case components.BuildingSettlement:
 		classes = []components.Class{components.ClassWorker}
-	case BuildingBarracks:
-		bottomSprite = atlas.Barracks
-		topSprite = atlas.BarracksTop
+	case components.BuildingBarracks:
 		classes = []components.Class{components.ClassWarrior, components.ClassKnight}
+	case components.BuildingChapel:
+		classes = []components.Class{components.ClassPriest}
 	}
+
+	bottomSprite, topSprite := SpritesForBuilding(buildingType)
 
 	w, h := bottomSprite.Size()
 	if !topSprite.IsZero() {
@@ -84,4 +68,41 @@ func (b Building) GetClickable() *components.Clickable {
 
 func (b Building) GetUnitSpawner() *components.UnitSpawner {
 	return b.UnitSpawner
+}
+
+func SpritesForBuilding(buildingType components.BuildingType) (bottomSprite engine.Sprite, topSprite engine.Sprite) {
+	switch buildingType {
+	case components.BuildingSettlement:
+		return atlas.Castle, atlas.CastleTop
+	case components.BuildingBarracks:
+		return atlas.Barracks, atlas.BarracksTop
+	case components.BuildingChapel:
+		return atlas.Chapel, atlas.ChapelTop
+	case components.BuildingForge:
+		return atlas.Forge, engine.Sprite{}
+	case components.BuildingTower:
+		return atlas.Tower, atlas.TowerTop
+	}
+
+	return engine.Sprite{}, engine.Sprite{}
+}
+
+func SpriteForBuilding(buildingType components.BuildingType) engine.Sprite {
+	bottom, top := SpritesForBuilding(buildingType)
+	if top.IsZero() {
+		return bottom
+	}
+
+	bottomWidth, bottomHeight := bottom.Size()
+	_, topHeight := top.Size()
+
+	width := bottomWidth
+	height := bottomHeight + topHeight
+
+	sprite := engine.NewBlankSprite(width, height)
+	sprite.Image().Fill(colornames.Green)
+	sprite.DrawAtPosition(top, width/2, topHeight)
+	sprite.DrawAtPosition(bottom, width/2, height)
+
+	return sprite
 }

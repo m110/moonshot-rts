@@ -128,7 +128,8 @@ func (c ClickingSystem) findAllEntitiesInOverlay() []engine.Entity {
 	for _, l := range c.entities {
 		for _, e := range l.All() {
 			entity := e.(clickingEntity)
-			if !entity.GetClickable().ByOverlay {
+			clickable := entity.GetClickable()
+			if clickable.Disabled || !clickable.ByOverlay {
 				continue
 			}
 

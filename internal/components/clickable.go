@@ -10,7 +10,17 @@ type Clickable struct {
 	// Bounds defines position relative to WorldSpace
 	Bounds engine.Rect
 
+	Disabled bool
+
 	ByOverlay bool
+}
+
+func (c *Clickable) Disable() {
+	c.Disabled = true
+}
+
+func (c *Clickable) Enable() {
+	c.Disabled = false
 }
 
 func BoundsFromSprite(sprite engine.Sprite) engine.Rect {

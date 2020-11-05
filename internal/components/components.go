@@ -66,7 +66,30 @@ type UnitSpawnerOwner interface {
 	GetUnitSpawner() *UnitSpawner
 }
 
+type BuildingType int
+
+const (
+	BuildingSettlement BuildingType = iota
+	BuildingBarracks
+	BuildingChapel
+	BuildingForge
+	BuildingTower
+)
+
+type SettlementType int
+
+const (
+	SettlementColony SettlementType = iota
+	SettlementVillage
+	SettlementCastle
+)
+
 type Builder struct {
+	Buildings []BuildingType
+}
+
+type BuilderOwner interface {
+	GetBuilder() *Builder
 }
 
 type Team int
