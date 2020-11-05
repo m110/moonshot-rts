@@ -17,30 +17,6 @@ type Unit struct {
 	*components.Builder
 }
 
-func (u Unit) GetWorldSpace() *components.WorldSpace {
-	return u.WorldSpace
-}
-
-func (u Unit) GetDrawable() *components.Drawable {
-	return u.Drawable
-}
-
-func (u Unit) GetSelectable() *components.Selectable {
-	return u.Selectable
-}
-
-func (u Unit) GetMovable() *components.Movable {
-	return u.Movable
-}
-
-func (u Unit) GetClickable() *components.Clickable {
-	return u.Clickable
-}
-
-func (u Unit) GetBuilder() *components.Builder {
-	return u.Builder
-}
-
 type spriteGetter interface {
 	SpriteForUnit(components.Team, components.Class) engine.Sprite
 }

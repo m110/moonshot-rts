@@ -47,10 +47,6 @@ func NewFourButtonPanel(buttonConfigs []ButtonConfig) Panel {
 	return p
 }
 
-func (p Panel) GetClickable() *components.Clickable {
-	return p.Clickable
-}
-
 type PanelButton struct {
 	Object
 	*components.Clickable
@@ -86,12 +82,4 @@ func NewPanelButton(color components.UIColor, spriteTop engine.Sprite, action fu
 	}
 
 	return b
-}
-
-func (b PanelButton) GetClickable() *components.Clickable {
-	return b.Clickable
-}
-
-func (b PanelButton) GetButton() *components.Button {
-	return b.Button
 }

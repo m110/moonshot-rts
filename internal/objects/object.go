@@ -18,14 +18,6 @@ type Object struct {
 	*components.Drawable
 }
 
-func (o Object) GetWorldSpace() *components.WorldSpace {
-	return o.WorldSpace
-}
-
-func (o Object) GetDrawable() *components.Drawable {
-	return o.Drawable
-}
-
 func NewObject(sprite engine.Sprite, layer components.DrawingLayer) Object {
 	return Object{
 		BaseEntity: engine.NewBaseEntity(),

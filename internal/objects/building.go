@@ -58,18 +58,6 @@ func NewBuilding(position engine.Vector, buildingType components.BuildingType) B
 	return b
 }
 
-func (b Building) GetSelectable() *components.Selectable {
-	return b.Selectable
-}
-
-func (b Building) GetClickable() *components.Clickable {
-	return b.Clickable
-}
-
-func (b Building) GetUnitSpawner() *components.UnitSpawner {
-	return b.UnitSpawner
-}
-
 func SpritesForBuilding(buildingType components.BuildingType) (bottomSprite engine.Sprite, topSprite engine.Sprite) {
 	switch buildingType {
 	case components.BuildingSettlement:

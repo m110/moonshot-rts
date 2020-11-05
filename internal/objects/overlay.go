@@ -33,10 +33,6 @@ func NewOverlay(width int, height int, pivotType engine.PivotType) Overlay {
 	return o
 }
 
-func (o Overlay) GetSize() *components.Size {
-	return o.Size
-}
-
 func NewRectangleSprite(owner components.SizeOwner, pivotType engine.PivotType) engine.Sprite {
 	width := float64(owner.GetSize().Width)
 	height := float64(owner.GetSize().Height)
@@ -52,12 +48,4 @@ func NewRectangleSprite(owner components.SizeOwner, pivotType engine.PivotType) 
 	ebitenutil.DrawRect(sprite.Image(), 0, height-lineSize, width, lineSize, c)
 
 	return sprite
-}
-
-func (o Overlay) GetWorldSpace() *components.WorldSpace {
-	return o.WorldSpace
-}
-
-func (o Overlay) GetDrawable() *components.Drawable {
-	return o.Drawable
 }
