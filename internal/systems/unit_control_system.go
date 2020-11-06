@@ -12,6 +12,7 @@ type unitControlEntity interface {
 	components.WorldSpaceOwner
 	components.MovableOwner
 	components.BuilderOwner
+	components.TimeActionsOwner
 }
 
 type UnitControlSystem struct {
@@ -21,9 +22,9 @@ type UnitControlSystem struct {
 
 	activeEntities EntityList
 
-	buildMode           bool
-	buildingToBuild     components.BuildingType
-	buildingsInProgress map[engine.EntityID]components.BuildingType
+	buildMode       bool
+	buildingToBuild components.BuilderOption
+	buildingsQueued map[engine.EntityID]components.BuilderOption
 
 	buildIcon    engine.Sprite
 	actionButton *objects.PanelButton
@@ -42,7 +43,7 @@ func NewUnitControlSystem(config Config, eventBus *engine.EventBus, spawner spaw
 
 func (u *UnitControlSystem) Start() {
 	u.buildMode = false
-	u.buildingsInProgress = map[engine.EntityID]components.BuildingType{}
+	u.buildingsQueued = map[engine.EntityID]components.BuilderOption{}
 
 	u.buildIcon = atlas.Hammer
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
@@ -80,13 +81,19 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 			entity := e.(unitControlEntity)
 			entity.GetMovable().SetTarget(event.Point)
 
+			_, ok := u.buildingsQueued[entity.ID()]
+			if ok {
+				// Entity moved after commanded to build - cancel the building
+				delete(u.buildingsQueued, entity.ID())
+			}
+
 			if u.buildMode {
-				u.buildingsInProgress[entity.ID()] = u.buildingToBuild
+				u.buildingsQueued[entity.ID()] = u.buildingToBuild
 				u.buildMode = false
 			}
 		}
 	case EntityReachedTarget:
-		buildingType, ok := u.buildingsInProgress[event.Entity.ID()]
+		buildingType, ok := u.buildingsQueued[event.Entity.ID()]
 		if !ok {
 			return
 		}
@@ -100,10 +107,11 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 		pos := uce.GetWorldSpace().WorldPosition()
 		pos.Translate(0, -24)
 
-		building := objects.NewBuilding(pos, buildingType)
+		// TODO set timer
+		building := objects.NewBuilding(pos, buildingType.BuildingType)
 		u.base.Spawner.SpawnBuilding(building)
 
-		delete(u.buildingsInProgress, event.Entity.ID())
+		delete(u.buildingsQueued, event.Entity.ID())
 	}
 }
 
@@ -124,7 +132,7 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 
 func (u *UnitControlSystem) showActionButton() {
 	entity := u.activeEntities.All()[0].(unitControlEntity)
-	if len(entity.GetBuilder().Buildings) == 0 {
+	if len(entity.GetBuilder().Options) == 0 {
 		return
 	}
 
@@ -150,19 +158,19 @@ func (u *UnitControlSystem) hideActionButton() {
 
 func (u *UnitControlSystem) showActionPanel() {
 	entity := u.activeEntities.All()[0].(unitControlEntity)
-	buildings := entity.GetBuilder().Buildings
+	options := entity.GetBuilder().Options
 
 	var configs []objects.ButtonConfig
-	for i := range buildings {
-		b := buildings[i]
-		sprite := objects.SpriteForBuilding(b)
+	for i := range options {
+		o := options[i]
+		sprite := objects.SpriteForBuilding(o.BuildingType)
 		sprite.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
 		configs = append(configs, objects.ButtonConfig{
 			Sprite: sprite,
 			Action: func() {
 				u.buildMode = true
-				u.buildingToBuild = b
+				u.buildingToBuild = o
 				u.hideActionsPanel()
 			},
 		})

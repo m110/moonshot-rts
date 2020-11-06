@@ -83,3 +83,26 @@ func NewPanelButton(color components.UIColor, spriteTop engine.Sprite, action fu
 
 	return b
 }
+
+type ProgressBar struct {
+	Object
+	*components.ProgressBar
+}
+
+func NewHorizontalProgressBar() ProgressBar {
+	return ProgressBar{
+		Object: NewObject(engine.NewBlankSprite(0, 0), components.LayerForeground),
+		ProgressBar: &components.ProgressBar{
+			Background: components.ProgressBarSprites{
+				Left:  atlas.BarBackHorizontalLeft,
+				Mid:   atlas.BarBackHorizontalMid,
+				Right: atlas.BarBackHorizontalRight,
+			},
+			Foreground: components.ProgressBarSprites{
+				Left:  atlas.BarGreenHorizontalLeft,
+				Mid:   atlas.BarGreenHorizontalMid,
+				Right: atlas.BarGreenHorizontalRight,
+			},
+		},
+	}
+}

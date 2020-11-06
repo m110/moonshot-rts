@@ -14,6 +14,10 @@ func (b Building) GetUnitSpawner() *components.UnitSpawner {
 	return b.UnitSpawner
 }
 
+func (b Building) GetTimeActions() *components.TimeActions {
+	return b.TimeActions
+}
+
 func (o Object) GetWorldSpace() *components.WorldSpace {
 	return o.WorldSpace
 }
@@ -44,4 +48,8 @@ func (p PanelButton) GetClickable() *components.Clickable {
 
 func (p PanelButton) GetButton() *components.Button {
 	return p.Button
+}
+
+func (p ProgressBar) GetProgressBar() *components.ProgressBar {
+	return p.ProgressBar
 }

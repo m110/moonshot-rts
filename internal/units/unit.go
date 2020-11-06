@@ -1,6 +1,8 @@
 package units
 
 import (
+	"time"
+
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 	"github.com/m110/moonshot-rts/internal/objects"
@@ -15,6 +17,7 @@ type Unit struct {
 	*components.Selectable
 	*components.Clickable
 	*components.Builder
+	*components.TimeActions
 }
 
 type spriteGetter interface {
@@ -26,14 +29,26 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 	w, h := sprite.Size()
 	overlay := objects.NewOverlay(w+20, h+20, engine.PivotBottom)
 
-	var buildings []components.BuildingType
+	var options []components.BuilderOption
 	switch class {
 	case components.ClassWorker:
-		buildings = []components.BuildingType{
-			components.BuildingBarracks,
-			components.BuildingForge,
-			components.BuildingChapel,
-			components.BuildingTower,
+		options = []components.BuilderOption{
+			{
+				BuildingType: components.BuildingBarracks,
+				SpawnTime:    time.Second * 10,
+			},
+			{
+				BuildingType: components.BuildingForge,
+				SpawnTime:    time.Second * 5,
+			},
+			{
+				BuildingType: components.BuildingChapel,
+				SpawnTime:    time.Second * 15,
+			},
+			{
+				BuildingType: components.BuildingTower,
+				SpawnTime:    time.Second * 20,
+			},
 		}
 	}
 
@@ -57,8 +72,9 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 			ByOverlay: true,
 		},
 		&components.Builder{
-			Buildings: buildings,
+			Options: options,
 		},
+		&components.TimeActions{},
 	}
 
 	u.GetWorldSpace().AddChild(u, overlay)

@@ -20,6 +20,9 @@ type Game struct {
 type System interface {
 	Start()
 	Update(dt float64)
+	// TODO It seems each system doesn't new a Draw method
+	// Possibly, there could be just one system with it (DrawingSystem)
+	// Or perhaps just a few - for example, WorldDrawingSystem and UIDrawingSystem could make sense
 	Draw(canvas engine.Sprite)
 	Remove(entity engine.Entity)
 }
@@ -41,6 +44,7 @@ func NewGame(config systems.Config) *Game {
 func (g *Game) Start() {
 	g.eventBus = engine.NewEventBus()
 
+	// TODO Refactor the base system - it seems the arguments get repetitive
 	g.systems = []System{
 		systems.NewTilemapSystem(g.config, g.eventBus, g),
 		systems.NewDrawingSystem(g.config, g.eventBus, g),
@@ -51,6 +55,8 @@ func (g *Game) Start() {
 		systems.NewBuildingControlSystem(g.config, g.eventBus, g),
 		systems.NewClickingSystem(g.config, g.eventBus, g),
 		systems.NewButtonsSystem(g.config, g.eventBus, g),
+		systems.NewTimeActionsSystem(g.config, g.eventBus, g),
+		systems.NewProgressBarSystem(g.config, g.eventBus, g),
 	}
 
 	for _, s := range g.systems {
@@ -126,6 +132,8 @@ func (g *Game) SpawnBuilding(building objects.Building) {
 			system.Add(building)
 		case *systems.ClickingSystem:
 			system.Add(building)
+		case *systems.TimeActionsSystem:
+			system.Add(building)
 		}
 	}
 }
@@ -146,6 +154,8 @@ func (g *Game) SpawnUnit(unit units.Unit) {
 		case *systems.UnitControlSystem:
 			system.Add(unit)
 		case *systems.ClickingSystem:
+			system.Add(unit)
+		case *systems.TimeActionsSystem:
 			system.Add(unit)
 		}
 	}
@@ -224,6 +234,28 @@ func (g *Game) RemovePanelButton(button objects.PanelButton) {
 			system.Remove(button)
 		case *systems.ButtonsSystem:
 			system.Remove(button)
+		}
+	}
+}
+
+func (g *Game) SpawnProgressBar(progressBar objects.ProgressBar) {
+	for _, s := range g.systems {
+		switch system := s.(type) {
+		case *systems.DrawingSystem:
+			system.Add(progressBar)
+		case *systems.ProgressBarSystem:
+			system.Add(progressBar)
+		}
+	}
+}
+
+func (g *Game) RemoveProgressBar(progressBar objects.ProgressBar) {
+	for _, s := range g.systems {
+		switch system := s.(type) {
+		case *systems.DrawingSystem:
+			system.Remove(progressBar)
+		case *systems.ProgressBarSystem:
+			system.Remove(progressBar)
 		}
 	}
 }

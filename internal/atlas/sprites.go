@@ -55,6 +55,14 @@ var (
 	ButtonBrownPressed engine.Sprite
 
 	Hammer engine.Sprite
+
+	BarBackHorizontalLeft  engine.Sprite
+	BarBackHorizontalMid   engine.Sprite
+	BarBackHorizontalRight engine.Sprite
+
+	BarGreenHorizontalLeft  engine.Sprite
+	BarGreenHorizontalMid   engine.Sprite
+	BarGreenHorizontalRight engine.Sprite
 )
 
 type TeamSprites struct {
@@ -171,6 +179,14 @@ func LoadSprites(rtsPath string, uiPath string) error {
 		return err
 	}
 	Hammer = engine.NewSpriteFromImage(hammerImg)
+
+	BarBackHorizontalLeft = engine.NewSpriteFromImage(uiAtlas.ImageByName("barBack_horizontalLeft"))
+	BarBackHorizontalMid = engine.NewSpriteFromImage(uiAtlas.ImageByName("barBack_horizontalMid"))
+	BarBackHorizontalRight = engine.NewSpriteFromImage(uiAtlas.ImageByName("barBack_horizontalRight"))
+
+	BarGreenHorizontalLeft = engine.NewSpriteFromImage(uiAtlas.ImageByName("barGreen_horizontalLeft"))
+	BarGreenHorizontalMid = engine.NewSpriteFromImage(uiAtlas.ImageByName("barGreen_horizontalMid"))
+	BarGreenHorizontalRight = engine.NewSpriteFromImage(uiAtlas.ImageByName("barGreen_horizontalRight"))
 
 	return nil
 }

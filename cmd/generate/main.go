@@ -35,6 +35,7 @@ var structs = []interface{}{
 	objects.Overlay{},
 	objects.Panel{},
 	objects.PanelButton{},
+	objects.ProgressBar{},
 	tiles.Tile{},
 	units.Unit{},
 }

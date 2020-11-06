@@ -1,10 +1,11 @@
 package objects
 
 import (
+	"time"
+
 	"github.com/m110/moonshot-rts/internal/atlas"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"golang.org/x/image/colornames"
 )
 
 type Building struct {
@@ -12,17 +13,37 @@ type Building struct {
 	*components.Selectable
 	*components.Clickable
 	*components.UnitSpawner
+	*components.TimeActions
 }
 
 func NewBuilding(position engine.Vector, buildingType components.BuildingType) Building {
-	var classes []components.Class
+	var options []components.UnitSpawnerOption
 	switch buildingType {
 	case components.BuildingSettlement:
-		classes = []components.Class{components.ClassWorker}
+		options = []components.UnitSpawnerOption{
+			{
+				Class:     components.ClassWorker,
+				SpawnTime: 5 * time.Second,
+			},
+		}
 	case components.BuildingBarracks:
-		classes = []components.Class{components.ClassWarrior, components.ClassKnight}
+		options = []components.UnitSpawnerOption{
+			{
+				Class:     components.ClassWarrior,
+				SpawnTime: 5 * time.Second,
+			},
+			{
+				Class:     components.ClassKnight,
+				SpawnTime: 10 * time.Second,
+			},
+		}
 	case components.BuildingChapel:
-		classes = []components.Class{components.ClassPriest}
+		options = []components.UnitSpawnerOption{
+			{
+				Class:     components.ClassPriest,
+				SpawnTime: 15 * time.Second,
+			},
+		}
 	}
 
 	bottomSprite, topSprite := SpritesForBuilding(buildingType)
@@ -42,8 +63,9 @@ func NewBuilding(position engine.Vector, buildingType components.BuildingType) B
 			Bounds: components.BoundsFromSprite(bottomSprite),
 		},
 		UnitSpawner: &components.UnitSpawner{
-			Classes: classes,
+			Options: options,
 		},
+		TimeActions: &components.TimeActions{},
 	}
 
 	b.GetWorldSpace().AddChild(b, overlay)
@@ -88,7 +110,6 @@ func SpriteForBuilding(buildingType components.BuildingType) engine.Sprite {
 	height := bottomHeight + topHeight
 
 	sprite := engine.NewBlankSprite(width, height)
-	sprite.Image().Fill(colornames.Green)
 	sprite.DrawAtPosition(top, width/2, topHeight)
 	sprite.DrawAtPosition(bottom, width/2, height)
 

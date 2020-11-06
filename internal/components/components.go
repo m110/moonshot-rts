@@ -1,6 +1,8 @@
 package components
 
 import (
+	"time"
+
 	"github.com/m110/moonshot-rts/internal/engine"
 )
 
@@ -58,8 +60,29 @@ type SizeOwner interface {
 	GetSize() *Size
 }
 
+type UnitSpawnerOption struct {
+	Class     Class
+	SpawnTime time.Duration
+}
+
 type UnitSpawner struct {
-	Classes []Class
+	Options []UnitSpawnerOption
+	Queue   []UnitSpawnerOption
+	Timer   *engine.CountdownTimer
+}
+
+func (u *UnitSpawner) AddToQueue(option UnitSpawnerOption) {
+	u.Queue = append(u.Queue, option)
+}
+
+func (u *UnitSpawner) PopFromQueue() (UnitSpawnerOption, bool) {
+	if len(u.Queue) > 0 {
+		opt := u.Queue[0]
+		u.Queue = u.Queue[1:]
+		return opt, true
+	}
+
+	return UnitSpawnerOption{}, false
 }
 
 type UnitSpawnerOwner interface {
@@ -84,12 +107,45 @@ const (
 	SettlementCastle
 )
 
+type BuilderOption struct {
+	BuildingType BuildingType
+	SpawnTime    time.Duration
+}
+
 type Builder struct {
-	Buildings []BuildingType
+	Options []BuilderOption
+	Queue   []BuilderOption
+	Timer   *engine.CountdownTimer
+}
+
+func (b *Builder) AddToQueue(option BuilderOption) {
+	b.Queue = append(b.Queue, option)
+}
+
+func (b *Builder) PopFromQueue() (BuilderOption, bool) {
+	if len(b.Queue) > 0 {
+		opt := b.Queue[0]
+		b.Queue = b.Queue[1:]
+		return opt, true
+	}
+
+	return BuilderOption{}, false
 }
 
 type BuilderOwner interface {
 	GetBuilder() *Builder
+}
+
+type TimeActions struct {
+	Timers []*engine.CountdownTimer
+}
+
+type TimeActionsOwner interface {
+	GetTimeActions() *TimeActions
+}
+
+func (t *TimeActions) AddTimer(timer *engine.CountdownTimer) {
+	t.Timers = append(t.Timers, timer)
 }
 
 type Team int
@@ -114,4 +170,29 @@ const (
 type Citizen struct {
 	Team  Team
 	Class Class
+}
+
+type ProgressBarSprites struct {
+	Left  engine.Sprite
+	Mid   engine.Sprite
+	Right engine.Sprite
+}
+
+type ProgressBar struct {
+	Background ProgressBarSprites
+	Foreground ProgressBarSprites
+	Progress   float64
+}
+
+func (p *ProgressBar) SetProgress(progress float64) {
+	if progress < 0 {
+		progress = 0
+	} else if progress > 1.0 {
+		progress = 1.0
+	}
+	p.Progress = progress
+}
+
+type ProgressBarOwner interface {
+	GetProgressBar() *ProgressBar
 }

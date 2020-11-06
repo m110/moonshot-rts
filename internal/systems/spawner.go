@@ -16,4 +16,6 @@ type spawner interface {
 	SpawnPanelButton(panel objects.PanelButton)
 	RemovePanelButton(panel objects.PanelButton)
 	SpawnDrawingEntity(entity DrawingEntity)
+	SpawnProgressBar(progressBar objects.ProgressBar)
+	RemoveProgressBar(progressBar objects.ProgressBar)
 }

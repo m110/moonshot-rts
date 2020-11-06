@@ -29,3 +29,7 @@ func (u Unit) GetClickable() *components.Clickable {
 func (u Unit) GetBuilder() *components.Builder {
 	return u.Builder
 }
+
+func (u Unit) GetTimeActions() *components.TimeActions {
+	return u.TimeActions
+}
