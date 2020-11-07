@@ -1,6 +1,10 @@
 package systems
 
 import (
+	"image"
+
+	"github.com/hajimehoshi/ebiten/v2"
+
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -28,28 +32,26 @@ func (p ProgressBarSystem) Start() {
 func (p ProgressBarSystem) Update(dt float64) {
 	for _, e := range p.entities.All() {
 		entity := e.(progressBarEntity)
-		entity.GetDrawable().Sprite = updateProgressBarSprite(entity.GetProgressBar())
+		updateProgressBarSprite(entity)
 	}
 }
 
-func updateProgressBarSprite(bar *components.ProgressBar) engine.Sprite {
-	// TODO probably not a good idea to create the new image every frame
-	midLength := 3
+func updateProgressBarSprite(entity progressBarEntity) {
+	bar := entity.GetProgressBar()
 
-	background := fillProgressBar(bar.Background, midLength, 1.0)
-	foreground := fillProgressBar(bar.Foreground, midLength, bar.Progress)
+	entity.GetDrawable().Sprite.Image().Clear()
+	entity.GetDrawable().Sprite.Draw(bar.Background.Full)
 
-	background.Draw(foreground)
-	background.SetPivot(engine.NewPivotForSprite(background, engine.PivotCenter))
-
-	return background
+	rect := image.Rect(0, 0, int(float64(bar.Background.Full.Width())*bar.Progress), bar.Background.Full.Height())
+	foreground := entity.GetProgressBar().Foreground.Full.Image().SubImage(rect)
+	entity.GetDrawable().Sprite.Image().DrawImage(ebiten.NewImageFromImage(foreground), nil)
 }
 
-func fillProgressBar(sprites components.ProgressBarSprites, midLength int, widthPercent float64) engine.Sprite {
+func fillProgressBar(sprites components.ProgressBarSprites, midLength int) engine.Sprite {
 	width := sprites.Left.Width() + midLength*sprites.Mid.Width() + sprites.Right.Width()
 	height := sprites.Left.Width() + midLength*sprites.Mid.Width() + sprites.Right.Width()
 
-	sprite := engine.NewBlankSprite(int(float64(width)*widthPercent), height)
+	sprite := engine.NewBlankSprite(width, height)
 
 	sprite.DrawAtPosition(sprites.Left, 0, 0)
 	x := sprites.Left.Width()
@@ -64,6 +66,15 @@ func fillProgressBar(sprites components.ProgressBarSprites, midLength int, width
 func (p ProgressBarSystem) Draw(canvas engine.Sprite) {}
 
 func (p *ProgressBarSystem) Add(entity progressBarEntity) {
+	midLength := 3
+
+	bar := entity.GetProgressBar()
+	bar.Background.Full = fillProgressBar(bar.Background, midLength)
+	bar.Foreground.Full = fillProgressBar(bar.Foreground, midLength)
+
+	entity.GetDrawable().Sprite = engine.NewBlankSprite(bar.Background.Full.Size())
+	entity.GetDrawable().Sprite.SetPivot(engine.NewPivotForSprite(entity.GetDrawable().Sprite, engine.PivotCenter))
+
 	p.entities.Add(entity)
 }
 

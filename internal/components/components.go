@@ -176,6 +176,8 @@ type ProgressBarSprites struct {
 	Left  engine.Sprite
 	Mid   engine.Sprite
 	Right engine.Sprite
+
+	Full engine.Sprite
 }
 
 type ProgressBar struct {
