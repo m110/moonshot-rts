@@ -1,10 +1,12 @@
 package systems
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/m110/moonshot-rts/internal/atlas"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 	"github.com/m110/moonshot-rts/internal/objects"
+	"github.com/m110/moonshot-rts/internal/tiles"
 )
 
 type unitControlEntity interface {
@@ -15,8 +17,13 @@ type unitControlEntity interface {
 	components.TimeActionsOwner
 }
 
+type tileFinder interface {
+	TileAtPosition(position engine.Vector) (tiles.Tile, bool)
+}
+
 type UnitControlSystem struct {
 	BaseSystem
+	tileFinder tileFinder
 
 	entities EntityList
 
@@ -29,16 +36,27 @@ type UnitControlSystem struct {
 	buildIcon    engine.Sprite
 	actionButton *objects.PanelButton
 	actionsPanel *objects.Panel
+
+	highlightedTile   tiles.Tile
+	tileSelectionMode bool
 }
 
 type EntityReachedTarget struct {
 	Entity engine.Entity
 }
 
-func NewUnitControlSystem(base BaseSystem) *UnitControlSystem {
-	return &UnitControlSystem{
+func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSystem {
+	u := &UnitControlSystem{
 		BaseSystem: base,
+		tileFinder: tileFinder,
 	}
+
+	u.EventBus.Subscribe(PointClicked{}, u)
+	u.EventBus.Subscribe(EntitySelected{}, u)
+	u.EventBus.Subscribe(EntityUnselected{}, u)
+	u.EventBus.Subscribe(EntityReachedTarget{}, u)
+
+	return u
 }
 
 func (u *UnitControlSystem) Start() {
@@ -48,14 +66,13 @@ func (u *UnitControlSystem) Start() {
 	u.buildIcon = atlas.Hammer
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
-	u.EventBus.Subscribe(PointClicked{}, u)
-	u.EventBus.Subscribe(EntitySelected{}, u)
-	u.EventBus.Subscribe(EntityUnselected{}, u)
-	u.EventBus.Subscribe(EntityReachedTarget{}, u)
+	u.highlightedTile = tiles.NewHighlightTile(u.Config.TileMap.TileWidth, u.Config.TileMap.TileHeight)
+	u.Spawner.SpawnTile(u.highlightedTile)
 }
 
 func (u UnitControlSystem) Update(dt float64) {
 	u.moveEntities(dt)
+	u.updateHighlightedTile()
 }
 
 func (u *UnitControlSystem) HandleEvent(e engine.Event) {
@@ -66,6 +83,8 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 			return
 		}
 
+		u.tileSelectionMode = true
+
 		u.activeEntities.Add(foundEntity)
 		if len(u.activeEntities.All()) > 1 {
 			u.hideActionButton()
@@ -74,6 +93,7 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 		}
 	case EntityUnselected:
 		u.activeEntities.Remove(event.Entity)
+		u.tileSelectionMode = false
 		u.hideActionButton()
 		u.hideActionsPanel()
 	case PointClicked:
@@ -126,6 +146,22 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 				direction := entity.GetMovable().Target.Sub(entity.GetWorldSpace().WorldPosition()).Normalized()
 				entity.GetWorldSpace().Translate(direction.Mul(50 * dt).Unpack())
 			}
+		}
+	}
+}
+
+func (u *UnitControlSystem) updateHighlightedTile() {
+	u.highlightedTile.GetDrawable().Disable()
+	if u.tileSelectionMode {
+		x, y := ebiten.CursorPosition()
+		v := engine.Vector{X: float64(x), Y: float64(y)}
+		tile, ok := u.tileFinder.TileAtPosition(v)
+		if ok {
+			u.highlightedTile.GetDrawable().Enable()
+			u.highlightedTile.GetWorldSpace().SetInWorld(
+				tile.GetWorldSpace().WorldPosition().X,
+				tile.GetWorldSpace().WorldPosition().Y,
+			)
 		}
 	}
 }

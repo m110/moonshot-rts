@@ -38,24 +38,16 @@ type TilemapSystem struct {
 
 	world objects.Object
 
-	tiles           []tiles.Tile
-	debugTiles      []tiles.Tile
-	highlightedTile tiles.Tile
+	tiles      []tiles.Tile
+	debugTiles []tiles.Tile
 
 	castlePosition engine.Point
-
-	tileSelectionMode bool
 }
 
 func NewTilemapSystem(base BaseSystem) *TilemapSystem {
-	t := &TilemapSystem{
+	return &TilemapSystem{
 		BaseSystem: base,
 	}
-
-	t.EventBus.Subscribe(EntitySelected{}, t)
-	t.EventBus.Subscribe(EntityUnselected{}, t)
-
-	return t
 }
 
 func (t *TilemapSystem) Start() {
@@ -140,9 +132,6 @@ func (t *TilemapSystem) spawnTiles() {
 		}
 	}
 
-	t.highlightedTile = tiles.NewHighlightTile(t.Config.TileMap.TileWidth, t.Config.TileMap.TileHeight)
-	t.world.GetWorldSpace().AddChild(t.highlightedTile)
-	t.Spawner.SpawnTile(t.highlightedTile)
 }
 
 func (t *TilemapSystem) spawnDebugTiles() {
@@ -183,20 +172,6 @@ func (t TilemapSystem) Update(_ float64) {
 			t.GetDrawable().Disabled = !t.GetDrawable().Disabled
 		}
 	}
-
-	t.highlightedTile.GetDrawable().Disable()
-	if t.tileSelectionMode {
-		x, y := ebiten.CursorPosition()
-		v := engine.Vector{X: float64(x), Y: float64(y)}
-		tile, ok := t.TileAtPosition(v)
-		if ok {
-			t.highlightedTile.GetDrawable().Enable()
-			t.highlightedTile.GetWorldSpace().SetInWorld(
-				tile.GetWorldSpace().WorldPosition().X,
-				tile.GetWorldSpace().WorldPosition().Y,
-			)
-		}
-	}
 }
 
 func (t TilemapSystem) TileAtPosition(position engine.Vector) (tiles.Tile, bool) {
@@ -209,22 +184,6 @@ func (t TilemapSystem) TileAtPosition(position engine.Vector) (tiles.Tile, bool)
 	}
 
 	return tiles.Tile{}, false
-}
-
-func (t *TilemapSystem) HandleEvent(e engine.Event) {
-	switch event := e.(type) {
-	case EntitySelected:
-		// TODO is this responsibility of tilemap system, unit control system, or selection system?
-		if _, ok := event.Entity.(components.MovableOwner); ok {
-			t.tileSelectionMode = true
-		}
-	case EntityUnselected:
-		if _, ok := event.Entity.(components.MovableOwner); ok {
-			t.tileSelectionMode = false
-		}
-	default:
-		panic("received unknown event")
-	}
 }
 
 func (t TilemapSystem) Remove(e engine.Entity) {}

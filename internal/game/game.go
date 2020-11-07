@@ -47,13 +47,15 @@ func (g *Game) Start() {
 	g.eventBus = engine.NewEventBus()
 
 	baseSystem := systems.NewBaseSystem(g.config, g.eventBus, g)
+
+	tilemapSystem := systems.NewTilemapSystem(baseSystem)
 	g.systems = []System{
-		systems.NewTilemapSystem(baseSystem),
+		tilemapSystem,
 		systems.NewDrawingSystem(baseSystem),
 		systems.NewSelectionSystem(baseSystem),
 		systems.NewUISystem(baseSystem),
 		systems.NewResourcesSystem(baseSystem),
-		systems.NewUnitControlSystem(baseSystem),
+		systems.NewUnitControlSystem(baseSystem, tilemapSystem),
 		systems.NewBuildingControlSystem(baseSystem),
 		systems.NewClickingSystem(baseSystem),
 		systems.NewButtonsSystem(baseSystem),
