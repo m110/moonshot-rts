@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"image"
 	"image/color"
 	"math/rand"
 
@@ -146,6 +147,19 @@ func (s Sprite) DrawAtPosition(source Sprite, x int, y int) {
 	)
 
 	s.image.DrawImage(source.image, op)
+}
+
+func (s Sprite) DrawInSection(source Sprite, rect Rect) {
+	op := &ebiten.DrawImageOptions{}
+
+	x := int(rect.Position.X)
+	y := int(rect.Position.Y)
+	width := x + int(rect.Width)
+	height := y + int(rect.Height)
+
+	imageRect := image.Rect(x, y, width, height)
+
+	s.image.SubImage(imageRect).(*ebiten.Image).DrawImage(source.image, op)
 }
 
 func NewPivotForSprite(sprite Sprite, pivotType PivotType) Vector {

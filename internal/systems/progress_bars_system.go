@@ -35,14 +35,15 @@ func (p ProgressBarSystem) Update(dt float64) {
 func updateProgressBarSprite(entity progressBarEntity) {
 	bar := entity.GetProgressBar()
 
-	entity.GetDrawable().Sprite = engine.NewSpriteFromSprite(bar.Background.Full)
-
-	//rect := image.Rect(0, 0, int(float64(bar.Background.Full.Width())*bar.Progress), bar.Background.Full.Height())
-	// foreground := entity.GetProgressBar().Foreground.Full.Image().SubImage(rect)
-	width := int(float64(bar.Background.Full.Width()) * bar.Progress)
-	foreground := engine.NewBlankSprite(width, bar.Foreground.Full.Height())
-	foreground.Draw(bar.Foreground.Full)
-	entity.GetDrawable().Sprite.Draw(foreground)
+	width := float64(bar.Background.Full.Width()) * bar.Progress
+	rect := engine.Rect{
+		Position: engine.Vector{X: 0, Y: 0},
+		Width:    width,
+		Height:   float64(bar.Background.Full.Height()),
+	}
+	entity.GetDrawable().Sprite.Image().Clear()
+	entity.GetDrawable().Sprite.Draw(bar.Background.Full)
+	entity.GetDrawable().Sprite.DrawInSection(bar.Foreground.Full, rect)
 }
 
 func fillProgressBar(sprites components.ProgressBarSprites, midLength int) engine.Sprite {

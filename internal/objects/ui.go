@@ -91,7 +91,7 @@ type ProgressBar struct {
 
 func NewHorizontalProgressBar() ProgressBar {
 	return ProgressBar{
-		Object: NewObject(engine.NewBlankSprite(0, 0), components.LayerForeground),
+		Object: NewObject(engine.NewBlankSprite(1, 1), components.LayerForeground),
 		ProgressBar: &components.ProgressBar{
 			Background: components.ProgressBarSprites{
 				Left:  atlas.BarBackHorizontalLeft,

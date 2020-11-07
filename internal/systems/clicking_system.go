@@ -51,7 +51,7 @@ func NewClickingSystem(base BaseSystem) *ClickingSystem {
 }
 
 func (c *ClickingSystem) Start() {
-	c.overlay = objects.NewOverlay(0, 0, engine.PivotTopLeft)
+	c.overlay = objects.NewOverlay(1, 1, engine.PivotTopLeft)
 	c.overlay.GetDrawable().Disable()
 	c.Spawner.SpawnDrawingEntity(c.overlay)
 }
@@ -171,6 +171,15 @@ func (c *ClickingSystem) updateOverlay(cursor engine.Vector) {
 		int(math.Abs(cursor.X-c.overlayAnchor.X)),
 		int(math.Abs(cursor.Y-c.overlayAnchor.Y)),
 	)
+
+	if c.overlay.Size.Width == 0 {
+		c.overlay.Size.Width = 1
+	}
+
+	if c.overlay.Size.Height == 0 {
+		c.overlay.Size.Height = 1
+	}
+
 	c.overlay.Drawable.Sprite = objects.NewRectangleSprite(c.overlay, engine.PivotTopLeft)
 }
 
