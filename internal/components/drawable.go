@@ -22,11 +22,6 @@ const (
 	UILayerText
 )
 
-// TODO find better suffix than Owner
-type DrawableOwner interface {
-	GetDrawable() *Drawable
-}
-
 type Drawable struct {
 	Sprite engine.Sprite
 	Layer  DrawingLayer

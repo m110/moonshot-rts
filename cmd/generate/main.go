@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/objects"
 	"github.com/m110/moonshot-rts/internal/tiles"
 	"github.com/m110/moonshot-rts/internal/units"
@@ -16,20 +17,30 @@ import (
 const rootPkg = "github.com/m110/moonshot-rts/"
 const prefix = "*components."
 
-const interfaceTemplate = `
+const archetypeInterfaceTemplate = `
 func ({{.Short}} {{.Struct}}) Get{{.TypeName}}() {{.Prefix}}{{.TypeName}} {
 	return {{.Short}}.{{.TypeName}}
 }
 `
 
-type interfaceData struct {
+const componentOwnerTemplate = `
+type {{.TypeName}}Owner interface {
+	Get{{.TypeName}}() *{{.TypeName}}
+}
+`
+
+type archetypeData struct {
 	Short    string
 	Struct   string
 	TypeName string
 	Prefix   string
 }
 
-var structs = []interface{}{
+type componentData struct {
+	TypeName string
+}
+
+var archetypes = []interface{}{
 	objects.Building{},
 	objects.Object{},
 	objects.Overlay{},
@@ -40,16 +51,30 @@ var structs = []interface{}{
 	units.Unit{},
 }
 
+var allComponents = []interface{}{
+	components.Builder{},
+	components.Button{},
+	components.Clickable{},
+	components.Drawable{},
+	components.Movable{},
+	components.ProgressBar{},
+	components.Selectable{},
+	components.Size{},
+	components.TimeActions{},
+	components.UnitSpawner{},
+	components.WorldSpace{},
+}
+
 func main() {
-	content := map[string]string{}
+	archetypesContent := map[string]string{}
 
-	for _, s := range structs {
+	archetypeTpl, err := template.New("").Parse(archetypeInterfaceTemplate)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, s := range archetypes {
 		t := reflect.TypeOf(s)
-
-		tpl, err := template.New("").Parse(interfaceTemplate)
-		if err != nil {
-			panic(err)
-		}
 
 		pkg := strings.Replace(t.PkgPath(), rootPkg, "", 1)
 		pkg += "/getters_gen.go"
@@ -58,7 +83,7 @@ func main() {
 			f := t.Field(i)
 
 			if strings.HasPrefix(f.Type.String(), prefix) {
-				data := interfaceData{
+				data := archetypeData{
 					Short:    string(strings.ToLower(t.Name())[0]),
 					Struct:   t.Name(),
 					TypeName: strings.Replace(f.Type.String(), prefix, "", 1),
@@ -66,17 +91,17 @@ func main() {
 				}
 
 				b := bytes.Buffer{}
-				err = tpl.Execute(&b, data)
+				err = archetypeTpl.Execute(&b, data)
 				if err != nil {
 					panic(err)
 				}
 
-				content[pkg] += b.String()
+				archetypesContent[pkg] += b.String()
 			}
 		}
 	}
 
-	for path, c := range content {
+	for path, c := range archetypesContent {
 		o, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 		if err != nil {
 			panic(err)
@@ -86,6 +111,51 @@ func main() {
 		pkg := elements[len(elements)-2]
 
 		header := fmt.Sprintf("package %v\n\nimport \"%vinternal/components\"\n", pkg, rootPkg)
+
+		_, err = o.WriteString(header + c)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	componentsContent := map[string]string{}
+
+	componentTpl, err := template.New("").Parse(componentOwnerTemplate)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, c := range allComponents {
+		t := reflect.TypeOf(c)
+
+		pkg := strings.Replace(t.PkgPath(), rootPkg, "", 1)
+		pkg += "/owners_gen.go"
+
+		names := strings.Split(t.Name(), ".")
+		typeName := names[len(names)-1]
+		data := componentData{
+			TypeName: typeName,
+		}
+
+		b := bytes.Buffer{}
+		err = componentTpl.Execute(&b, data)
+		if err != nil {
+			panic(err)
+		}
+
+		componentsContent[pkg] += b.String()
+	}
+
+	for path, c := range componentsContent {
+		o, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+
+		elements := strings.Split(path, "/")
+		pkg := elements[len(elements)-2]
+
+		header := fmt.Sprintf("package %v\n", pkg)
 
 		_, err = o.WriteString(header + c)
 		if err != nil {

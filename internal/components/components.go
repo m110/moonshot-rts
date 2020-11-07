@@ -6,10 +6,6 @@ import (
 	"github.com/m110/moonshot-rts/internal/engine"
 )
 
-type SelectableOwner interface {
-	GetSelectable() *Selectable
-}
-
 type Selectable struct {
 	Selected bool
 	Overlay  DrawableOwner
@@ -23,10 +19,6 @@ func (s *Selectable) Select() {
 func (s *Selectable) Unselect() {
 	s.Selected = false
 	s.Overlay.GetDrawable().Disabled = true
-}
-
-type MovableOwner interface {
-	GetMovable() *Movable
 }
 
 type Movable struct {
@@ -56,10 +48,6 @@ func (s *Size) Set(w int, h int) {
 	s.Height = h
 }
 
-type SizeOwner interface {
-	GetSize() *Size
-}
-
 type UnitSpawnerOption struct {
 	Class     Class
 	SpawnTime time.Duration
@@ -83,10 +71,6 @@ func (u *UnitSpawner) PopFromQueue() (UnitSpawnerOption, bool) {
 	}
 
 	return UnitSpawnerOption{}, false
-}
-
-type UnitSpawnerOwner interface {
-	GetUnitSpawner() *UnitSpawner
 }
 
 type BuildingType int
@@ -132,16 +116,8 @@ func (b *Builder) PopFromQueue() (BuilderOption, bool) {
 	return BuilderOption{}, false
 }
 
-type BuilderOwner interface {
-	GetBuilder() *Builder
-}
-
 type TimeActions struct {
 	Timers []*engine.CountdownTimer
-}
-
-type TimeActionsOwner interface {
-	GetTimeActions() *TimeActions
 }
 
 func (t *TimeActions) AddTimer(timer *engine.CountdownTimer) {
@@ -193,8 +169,4 @@ func (p *ProgressBar) SetProgress(progress float64) {
 		progress = 1.0
 	}
 	p.Progress = progress
-}
-
-type ProgressBarOwner interface {
-	GetProgressBar() *ProgressBar
 }

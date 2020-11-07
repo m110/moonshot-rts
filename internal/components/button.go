@@ -19,7 +19,3 @@ type Button struct {
 	SpriteReleased engine.Sprite
 	SpritePressed  engine.Sprite
 }
-
-type ButtonOwner interface {
-	GetButton() *Button
-}

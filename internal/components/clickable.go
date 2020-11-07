@@ -2,10 +2,6 @@ package components
 
 import "github.com/m110/moonshot-rts/internal/engine"
 
-type ClickableOwner interface {
-	GetClickable() *Clickable
-}
-
 type Clickable struct {
 	// Bounds defines position relative to WorldSpace
 	Bounds engine.Rect
