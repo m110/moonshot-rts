@@ -69,9 +69,6 @@ func (b *BuildingControlSystem) Update(dt float64) {
 	}
 }
 
-func (b BuildingControlSystem) Draw(canvas engine.Sprite) {
-}
-
 func (b *BuildingControlSystem) HandleEvent(e engine.Event) {
 	switch event := e.(type) {
 	case EntitySelected:

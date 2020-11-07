@@ -91,8 +91,5 @@ func (u UISystem) Update(_ float64) {
 	)
 }
 
-func (u UISystem) Draw(canvas engine.Sprite) {
-}
-
 func (u UISystem) Remove(entity engine.Entity) {
 }

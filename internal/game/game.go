@@ -14,17 +14,19 @@ type Game struct {
 	config systems.Config
 
 	eventBus *engine.EventBus
-	systems  []System
+
+	systems        []System
+	drawingSystems []DrawingSystem
 }
 
 type System interface {
 	Start()
 	Update(dt float64)
-	// TODO It seems each system doesn't new a Draw method
-	// Possibly, there could be just one system with it (DrawingSystem)
-	// Or perhaps just a few - for example, WorldDrawingSystem and UIDrawingSystem could make sense
-	Draw(canvas engine.Sprite)
 	Remove(entity engine.Entity)
+}
+
+type DrawingSystem interface {
+	Draw(canvas engine.Sprite)
 }
 
 func NewGame(config systems.Config) *Game {
@@ -60,6 +62,11 @@ func (g *Game) Start() {
 	}
 
 	for _, s := range g.systems {
+		d, ok := s.(DrawingSystem)
+		if ok {
+			g.drawingSystems = append(g.drawingSystems, d)
+		}
+
 		s.Start()
 	}
 }
@@ -82,7 +89,7 @@ func (g *Game) Update() error {
 
 func (g Game) Draw(screen *ebiten.Image) {
 	screenSprite := engine.NewSpriteFromImage(screen)
-	for _, s := range g.systems {
+	for _, s := range g.drawingSystems {
 		s.Draw(screenSprite)
 	}
 }

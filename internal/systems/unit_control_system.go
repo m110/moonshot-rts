@@ -200,6 +200,3 @@ func (u *UnitControlSystem) Add(entity unitControlEntity) {
 func (u *UnitControlSystem) Remove(entity engine.Entity) {
 	u.entities.Remove(entity)
 }
-
-func (u UnitControlSystem) Draw(canvas engine.Sprite) {
-}

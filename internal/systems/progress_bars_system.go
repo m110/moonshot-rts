@@ -62,8 +62,6 @@ func fillProgressBar(sprites components.ProgressBarSprites, midLength int) engin
 	return sprite
 }
 
-func (p ProgressBarSystem) Draw(canvas engine.Sprite) {}
-
 func (p *ProgressBarSystem) Add(entity progressBarEntity) {
 	midLength := 3
 

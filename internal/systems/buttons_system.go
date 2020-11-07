@@ -55,8 +55,6 @@ func (b *ButtonsSystem) HandleEvent(e engine.Event) {
 
 func (b ButtonsSystem) Update(dt float64) {}
 
-func (b ButtonsSystem) Draw(canvas engine.Sprite) {}
-
 func (b *ButtonsSystem) Add(entity buttonsEntity) {
 	b.updateSprite(entity)
 	b.entities.Add(entity)

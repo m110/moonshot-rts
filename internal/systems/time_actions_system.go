@@ -40,9 +40,6 @@ func (t *TimeActionsSystem) Update(dt float64) {
 	}
 }
 
-func (t TimeActionsSystem) Draw(canvas engine.Sprite) {
-}
-
 func (t *TimeActionsSystem) Add(entity timeActionsEntity) {
 	t.entities.Add(entity)
 }

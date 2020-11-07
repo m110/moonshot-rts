@@ -188,9 +188,6 @@ func (c *ClickingSystem) hideOverlay() {
 	c.overlay.Drawable.Disable()
 }
 
-func (c ClickingSystem) Draw(canvas engine.Sprite) {
-}
-
 func (c *ClickingSystem) Add(entity clickingEntity) {
 	c.entities[entity.GetDrawable().Layer].Add(entity)
 }

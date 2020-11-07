@@ -104,9 +104,6 @@ func (s *SelectionSystem) unselectCurrentEntities() {
 	s.selectedEntities = nil
 }
 
-func (s SelectionSystem) Draw(canvas engine.Sprite) {
-}
-
 func (s *SelectionSystem) Add(entity selectionEntity) {
 	s.entities.Add(entity)
 }

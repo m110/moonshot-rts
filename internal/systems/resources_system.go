@@ -29,8 +29,5 @@ func (r ResourcesSystem) Start() {
 func (r ResourcesSystem) Update(dt float64) {
 }
 
-func (r ResourcesSystem) Draw(canvas engine.Sprite) {
-}
-
 func (r ResourcesSystem) Remove(entity engine.Entity) {
 }

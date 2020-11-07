@@ -215,8 +215,6 @@ func (t *TilemapSystem) HandleEvent(event engine.Event) {
 	}
 }
 
-func (t TilemapSystem) Draw(_ engine.Sprite) {}
-
 func (t TilemapSystem) Remove(e engine.Entity) {}
 
 type atlasSpriteGetter struct{}
