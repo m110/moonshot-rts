@@ -58,7 +58,7 @@ func NewForestTile(groundType GroundType, forestType ForestType) Tile {
 		y += engine.RandomRange(5, 10)
 
 		tree := objects.NewTree(forestToTripType(forestType))
-		t.GetWorldSpace().AddChild(t, tree)
+		t.GetWorldSpace().AddChild(tree)
 		tree.Translate(
 			float64(rand.Intn(50)+5),
 			float64(y),
@@ -99,7 +99,7 @@ func NewMountainsTile(groundType GroundType, mountainType objects.MountainType) 
 		float64(engine.RandomRange(widthOffset, width-widthOffset)),
 		float64(engine.RandomRange(heightOffset, height-heightOffset)),
 	)
-	t.GetWorldSpace().AddChild(t, mountain)
+	t.GetWorldSpace().AddChild(mountain)
 
 	return t
 }
@@ -113,7 +113,7 @@ func NewBuildingTile(groundType GroundType, buildingType components.BuildingType
 	}
 
 	building := objects.NewBuilding(buildingPos, buildingType)
-	t.GetWorldSpace().AddChild(t, building)
+	t.GetWorldSpace().AddChild(building)
 
 	return t
 }

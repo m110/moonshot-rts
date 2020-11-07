@@ -141,7 +141,7 @@ func (u *UnitControlSystem) showActionButton() {
 		u.showActionPanel()
 	})
 
-	entity.GetWorldSpace().AddChild(entity, button)
+	entity.GetWorldSpace().AddChild(button)
 
 	u.base.Spawner.SpawnPanelButton(button)
 	u.actionButton = &button
@@ -179,7 +179,7 @@ func (u *UnitControlSystem) showActionPanel() {
 	panel := objects.NewFourButtonPanel(configs)
 	u.base.Spawner.SpawnPanel(panel)
 
-	entity.GetWorldSpace().AddChild(entity, panel)
+	entity.GetWorldSpace().AddChild(panel)
 
 	u.actionsPanel = &panel
 }

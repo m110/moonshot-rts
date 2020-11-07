@@ -77,7 +77,7 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 		&components.TimeActions{},
 	}
 
-	u.GetWorldSpace().AddChild(u, overlay)
+	u.GetWorldSpace().AddChild(overlay)
 	overlay.GetWorldSpace().Translate(0, 10)
 
 	return u

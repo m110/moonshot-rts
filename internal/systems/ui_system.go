@@ -47,12 +47,12 @@ func (u *UISystem) Start() {
 
 	resourcesSprite := engine.NewBlankSprite(u.base.Config.UI.Width, u.base.Config.UI.Height)
 	u.resources = objects.NewObject(resourcesSprite, components.UILayerText)
-	ui.GetWorldSpace().AddChild(ui, u.resources)
+	ui.GetWorldSpace().AddChild(u.resources)
 	u.resources.Translate(20, 20)
 
 	fpsSprite := engine.NewBlankSprite(200, u.base.Config.UI.Height)
 	u.fps = objects.NewObject(fpsSprite, components.UILayerText)
-	ui.GetWorldSpace().AddChild(ui, u.fps)
+	ui.GetWorldSpace().AddChild(u.fps)
 	u.fps.Translate(float64(u.base.Config.UI.Width-200), 20)
 
 	u.base.Spawner.SpawnObject(ui)

@@ -7,7 +7,7 @@ type WorldSpace struct {
 	worldPosition engine.Vector
 	localPosition engine.Vector
 
-	Parent   WorldSpaceOwner
+	Parent   *WorldSpace
 	Children []WorldSpaceOwner
 }
 
@@ -57,8 +57,8 @@ func (w *WorldSpace) updateWorldPositionFromParents() {
 
 	parent := w.Parent
 	for parent != nil {
-		w.worldPosition = w.worldPosition.Add(parent.GetWorldSpace().LocalPosition())
-		parent = parent.GetWorldSpace().Parent
+		w.worldPosition = w.worldPosition.Add(parent.LocalPosition())
+		parent = parent.Parent
 	}
 
 	for _, child := range w.Children {
@@ -78,11 +78,9 @@ func (w WorldSpace) WorldPosition() engine.Vector {
 	return w.worldPosition
 }
 
-// TODO Oh this owner is so bad
-func (w *WorldSpace) AddChild(owner WorldSpaceOwner, child WorldSpaceOwner) {
+func (w *WorldSpace) AddChild(child WorldSpaceOwner) {
 	w.Children = append(w.Children, child)
 
-	// TODO This seems hacky
-	child.GetWorldSpace().Parent = owner
+	child.GetWorldSpace().Parent = w
 	child.GetWorldSpace().updateWorldPositionFromParents()
 }

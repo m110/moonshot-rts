@@ -134,14 +134,14 @@ func (t *TilemapSystem) spawnTiles() {
 			}
 
 			t.tiles = append(t.tiles, tile)
-			t.world.GetWorldSpace().AddChild(t.world, tile)
+			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(position.X, position.Y)
 			t.base.Spawner.SpawnTile(tile)
 		}
 	}
 
 	t.highlightedTile = tiles.NewHighlightTile(t.base.Config.TileMap.TileWidth, t.base.Config.TileMap.TileHeight)
-	t.world.GetWorldSpace().AddChild(t.world, t.highlightedTile)
+	t.world.GetWorldSpace().AddChild(t.highlightedTile)
 	t.base.Spawner.SpawnTile(t.highlightedTile)
 }
 
@@ -153,7 +153,7 @@ func (t *TilemapSystem) spawnDebugTiles() {
 				Y: float64(y * t.base.Config.TileMap.TileHeight),
 			}
 			tile := tiles.NewDebugTile(t.base.Config.TileMap.TileWidth, t.base.Config.TileMap.TileHeight)
-			t.world.GetWorldSpace().AddChild(t.world, tile)
+			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(pos.X, pos.Y)
 			t.debugTiles = append(t.debugTiles, tile)
 			t.base.Spawner.SpawnTile(tile)
@@ -172,7 +172,7 @@ func (t TilemapSystem) spawnUnits() {
 	spriteGetter := atlasSpriteGetter{}
 
 	king := units.NewUnit(components.TeamBlue, components.ClassKing, spriteGetter)
-	t.world.GetWorldSpace().AddChild(t.world, king)
+	t.world.GetWorldSpace().AddChild(king)
 	king.GetWorldSpace().Translate(unitsX(0), unitsY(1))
 	t.base.Spawner.SpawnUnit(king)
 }

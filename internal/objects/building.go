@@ -68,13 +68,13 @@ func NewBuilding(position engine.Vector, buildingType components.BuildingType) B
 		TimeActions: &components.TimeActions{},
 	}
 
-	b.GetWorldSpace().AddChild(b, overlay)
+	b.GetWorldSpace().AddChild(overlay)
 	b.WorldSpace.SetLocal(position.X, position.Y)
 
 	if !topSprite.IsZero() {
 		topSprite := NewObject(topSprite, components.LayerForeground)
 		topSprite.GetWorldSpace().SetLocal(0, float64(-bottomSprite.Height()))
-		b.GetWorldSpace().AddChild(b, topSprite)
+		b.GetWorldSpace().AddChild(topSprite)
 	}
 
 	return b

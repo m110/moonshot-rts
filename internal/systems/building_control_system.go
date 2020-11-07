@@ -170,7 +170,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 	progressBar := objects.NewHorizontalProgressBar()
 	b.base.Spawner.SpawnProgressBar(progressBar)
-	entity.GetWorldSpace().AddChild(entity, progressBar)
+	entity.GetWorldSpace().AddChild(progressBar)
 	// TODO better position
 	progressBar.GetWorldSpace().Translate(0, -30)
 }

@@ -33,7 +33,7 @@ func NewFourButtonPanel(buttonConfigs []ButtonConfig) Panel {
 	for i, s := range buttonConfigs {
 		b := NewPanelButton(components.UIColorBeige, s.Sprite, s.Action)
 		p.buttons = append(p.buttons, b)
-		p.WorldSpace.AddChild(p, b)
+		p.WorldSpace.AddChild(b)
 		b.WorldSpace.Translate(float64(x), float64(y))
 
 		if i%2 != 0 {
