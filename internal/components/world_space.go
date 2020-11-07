@@ -2,7 +2,6 @@ package components
 
 import "github.com/m110/moonshot-rts/internal/engine"
 
-// TODO Maybe not the best name, as it's local position for children?
 type WorldSpace struct {
 	worldPosition engine.Vector
 	localPosition engine.Vector

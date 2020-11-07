@@ -11,7 +11,6 @@ var (
 type Entity interface {
 	ID() EntityID
 	Equals(Entity) bool
-	Base() *BaseEntity
 }
 
 type BaseEntity struct {

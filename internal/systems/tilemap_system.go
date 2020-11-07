@@ -188,28 +188,40 @@ func (t TilemapSystem) Update(_ float64) {
 	if t.tileSelectionMode {
 		x, y := ebiten.CursorPosition()
 		v := engine.Vector{X: float64(x), Y: float64(y)}
-		for _, tile := range t.tiles {
-			bounds := tile.GetClickable().Bounds
-			bounds.Position = bounds.Position.Add(tile.GetWorldSpace().WorldPosition())
-			if bounds.WithinBounds(v) {
-				t.highlightedTile.GetDrawable().Enable()
-				t.highlightedTile.GetWorldSpace().SetInWorld(
-					tile.GetWorldSpace().WorldPosition().X,
-					tile.GetWorldSpace().WorldPosition().Y,
-				)
-			}
+		tile, ok := t.TileAtPosition(v)
+		if ok {
+			t.highlightedTile.GetDrawable().Enable()
+			t.highlightedTile.GetWorldSpace().SetInWorld(
+				tile.GetWorldSpace().WorldPosition().X,
+				tile.GetWorldSpace().WorldPosition().Y,
+			)
 		}
 	}
 }
 
-func (t *TilemapSystem) HandleEvent(event engine.Event) {
-	switch event.(type) {
+func (t TilemapSystem) TileAtPosition(position engine.Vector) (tiles.Tile, bool) {
+	for _, tile := range t.tiles {
+		bounds := tile.GetClickable().Bounds
+		bounds.Position = bounds.Position.Add(tile.GetWorldSpace().WorldPosition())
+		if bounds.WithinBounds(position) {
+			return tile, true
+		}
+	}
+
+	return tiles.Tile{}, false
+}
+
+func (t *TilemapSystem) HandleEvent(e engine.Event) {
+	switch event := e.(type) {
 	case EntitySelected:
-		// TODO this probably should be triggered by another event, more specific?
-		// Some event like "Tile selection enabled"?
-		t.tileSelectionMode = true
+		// TODO is this responsibility of tilemap system, unit control system, or selection system?
+		if _, ok := event.Entity.(components.MovableOwner); ok {
+			t.tileSelectionMode = true
+		}
 	case EntityUnselected:
-		t.tileSelectionMode = false
+		if _, ok := event.Entity.(components.MovableOwner); ok {
+			t.tileSelectionMode = false
+		}
 	default:
 		panic("received unknown event")
 	}
