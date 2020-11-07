@@ -11,13 +11,13 @@ type timeActionsEntity interface {
 }
 
 type TimeActionsSystem struct {
-	base     BaseSystem
+	BaseSystem
 	entities EntityList
 }
 
-func NewTimeActionsSystem(config Config, eventBus *engine.EventBus, spawner spawner) *TimeActionsSystem {
+func NewTimeActionsSystem(base BaseSystem) *TimeActionsSystem {
 	return &TimeActionsSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 

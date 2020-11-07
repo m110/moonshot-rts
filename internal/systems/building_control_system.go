@@ -14,7 +14,7 @@ type buildingControlEntity interface {
 }
 
 type BuildingControlSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	entities EntityList
 
@@ -25,15 +25,15 @@ type BuildingControlSystem struct {
 	spawnedUnits []units.Unit
 }
 
-func NewBuildingControlSystem(config Config, eventBus *engine.EventBus, spawner spawner) *BuildingControlSystem {
+func NewBuildingControlSystem(base BaseSystem) *BuildingControlSystem {
 	return &BuildingControlSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 
 func (b *BuildingControlSystem) Start() {
-	b.base.EventBus.Subscribe(EntitySelected{}, b)
-	b.base.EventBus.Subscribe(EntityUnselected{}, b)
+	b.EventBus.Subscribe(EntitySelected{}, b)
+	b.EventBus.Subscribe(EntityUnselected{}, b)
 }
 
 func (b *BuildingControlSystem) Update(dt float64) {
@@ -85,7 +85,7 @@ func (b *BuildingControlSystem) HandleEvent(e engine.Event) {
 	case EntityUnselected:
 		if b.activeBuilding != nil && event.Entity.Equals(b.activeBuilding) {
 			b.activeBuilding = nil
-			b.base.Spawner.RemovePanel(*b.buildPanel)
+			b.Spawner.RemovePanel(*b.buildPanel)
 			b.buildPanel = nil
 		}
 	}
@@ -113,7 +113,7 @@ func (b *BuildingControlSystem) ShowBuildPanel() {
 		})
 	}
 	buildPanel := objects.NewFourButtonPanel(configs)
-	b.base.Spawner.SpawnPanel(buildPanel)
+	b.Spawner.SpawnPanel(buildPanel)
 
 	pos := b.activeBuilding.GetWorldSpace().WorldPosition()
 	buildPanel.GetWorldSpace().SetInWorld(pos.X, pos.Y)
@@ -156,7 +156,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 				// TODO casting to concrete struct is a hack, there should be a better way to do this
 				p, ok := c.(objects.ProgressBar)
 				if ok {
-					b.base.Spawner.RemoveProgressBar(p)
+					b.Spawner.RemoveProgressBar(p)
 					// TODO A RemoveChild is missing here. Not trivial for now, and despawning should work fine
 				}
 			}
@@ -169,7 +169,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 
 func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 	progressBar := objects.NewHorizontalProgressBar()
-	b.base.Spawner.SpawnProgressBar(progressBar)
+	b.Spawner.SpawnProgressBar(progressBar)
 	entity.GetWorldSpace().AddChild(progressBar)
 	// TODO better position
 	progressBar.GetWorldSpace().Translate(0, -30)
@@ -177,7 +177,7 @@ func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 
 func (b *BuildingControlSystem) spawnUnit(spawnPosition engine.Vector, team components.Team, class components.Class) {
 	unit := units.NewUnit(team, class, atlasSpriteGetter{})
-	b.base.Spawner.SpawnUnit(unit)
+	b.Spawner.SpawnUnit(unit)
 
 	unit.GetWorldSpace().SetInWorld(spawnPosition.X, spawnPosition.Y)
 

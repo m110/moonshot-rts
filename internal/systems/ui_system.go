@@ -23,39 +23,39 @@ type UIConfig struct {
 }
 
 type UISystem struct {
-	base BaseSystem
+	BaseSystem
 
 	resources objects.Object
 	fps       objects.Object
 }
 
-func NewUISystem(config Config, eventBus *engine.EventBus, spawner spawner) *UISystem {
+func NewUISystem(base BaseSystem) *UISystem {
 	return &UISystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 
 func (u *UISystem) Start() {
-	u.base.EventBus.Subscribe(ResourcesUpdated{}, u)
+	u.EventBus.Subscribe(ResourcesUpdated{}, u)
 
-	sprite := engine.NewFilledSprite(u.base.Config.UI.Width, u.base.Config.UI.Height, colornames.Black)
+	sprite := engine.NewFilledSprite(u.Config.UI.Width, u.Config.UI.Height, colornames.Black)
 	ui := objects.NewObject(sprite, components.UILayerBackground)
 	ui.Translate(
-		float64(u.base.Config.UI.OffsetX),
-		float64(u.base.Config.UI.OffsetY),
+		float64(u.Config.UI.OffsetX),
+		float64(u.Config.UI.OffsetY),
 	)
 
-	resourcesSprite := engine.NewBlankSprite(u.base.Config.UI.Width, u.base.Config.UI.Height)
+	resourcesSprite := engine.NewBlankSprite(u.Config.UI.Width, u.Config.UI.Height)
 	u.resources = objects.NewObject(resourcesSprite, components.UILayerText)
 	ui.GetWorldSpace().AddChild(u.resources)
 	u.resources.Translate(20, 20)
 
-	fpsSprite := engine.NewBlankSprite(200, u.base.Config.UI.Height)
+	fpsSprite := engine.NewBlankSprite(200, u.Config.UI.Height)
 	u.fps = objects.NewObject(fpsSprite, components.UILayerText)
 	ui.GetWorldSpace().AddChild(u.fps)
-	u.fps.Translate(float64(u.base.Config.UI.Width-200), 20)
+	u.fps.Translate(float64(u.Config.UI.Width-200), 20)
 
-	u.base.Spawner.SpawnObject(ui)
+	u.Spawner.SpawnObject(ui)
 }
 
 func (u UISystem) updateResources(resources components.Resources) {
@@ -63,11 +63,11 @@ func (u UISystem) updateResources(resources components.Resources) {
 		resources.Food, resources.Wood, resources.Stone, resources.Gold, resources.Iron)
 
 	u.resources.Sprite.Image().Fill(colornames.Black)
-	bounds := text.BoundString(u.base.Config.UI.Font, content)
+	bounds := text.BoundString(u.Config.UI.Font, content)
 	text.Draw(
 		u.resources.Sprite.Image(),
 		content,
-		u.base.Config.UI.Font,
+		u.Config.UI.Font,
 		0, bounds.Dy(), colornames.White,
 	)
 }
@@ -82,11 +82,11 @@ func (u UISystem) HandleEvent(e engine.Event) {
 func (u UISystem) Update(_ float64) {
 	content := fmt.Sprintf("FPS: %2.0f", ebiten.CurrentFPS())
 	u.fps.Sprite.Image().Fill(colornames.Black)
-	bounds := text.BoundString(u.base.Config.UI.Font, content)
+	bounds := text.BoundString(u.Config.UI.Font, content)
 	text.Draw(
 		u.fps.Sprite.Image(),
 		content,
-		u.base.Config.UI.Font,
+		u.Config.UI.Font,
 		0, bounds.Dy(), colornames.White,
 	)
 }

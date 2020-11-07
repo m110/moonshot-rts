@@ -12,21 +12,21 @@ type buttonsEntity interface {
 }
 
 type ButtonsSystem struct {
-	base     BaseSystem
+	BaseSystem
 	entities EntityMap
 
 	activeButton buttonsEntity
 }
 
-func NewButtonsSystem(config Config, eventBus *engine.EventBus, spawner spawner) *ButtonsSystem {
+func NewButtonsSystem(base BaseSystem) *ButtonsSystem {
 	return &ButtonsSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 
 func (b *ButtonsSystem) Start() {
-	b.base.EventBus.Subscribe(EntityClicked{}, b)
-	b.base.EventBus.Subscribe(ClickReleased{}, b)
+	b.EventBus.Subscribe(EntityClicked{}, b)
+	b.EventBus.Subscribe(ClickReleased{}, b)
 }
 
 func (b *ButtonsSystem) HandleEvent(e engine.Event) {

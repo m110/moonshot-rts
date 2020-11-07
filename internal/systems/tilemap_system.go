@@ -34,7 +34,7 @@ func (t TilemapConfig) TotalHeight() int {
 }
 
 type TilemapSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	world objects.Object
 
@@ -47,31 +47,31 @@ type TilemapSystem struct {
 	tileSelectionMode bool
 }
 
-func NewTilemapSystem(config Config, eventBus *engine.EventBus, spawner spawner) *TilemapSystem {
+func NewTilemapSystem(base BaseSystem) *TilemapSystem {
 	t := &TilemapSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 
-	eventBus.Subscribe(EntitySelected{}, t)
-	eventBus.Subscribe(EntityUnselected{}, t)
+	t.EventBus.Subscribe(EntitySelected{}, t)
+	t.EventBus.Subscribe(EntityUnselected{}, t)
 
 	return t
 }
 
 func (t *TilemapSystem) Start() {
 	worldSprite := engine.NewFilledSprite(
-		t.base.Config.TileMap.TotalWidth(),
-		t.base.Config.TileMap.TotalHeight(),
+		t.Config.TileMap.TotalWidth(),
+		t.Config.TileMap.TotalHeight(),
 		colornames.White,
 	)
 
 	t.world = objects.NewObject(worldSprite, components.LayerBackground)
 	t.world.GetWorldSpace().Translate(
-		float64(t.base.Config.TileMap.OffsetX),
-		float64(t.base.Config.TileMap.OffsetY),
+		float64(t.Config.TileMap.OffsetX),
+		float64(t.Config.TileMap.OffsetY),
 	)
 
-	t.base.Spawner.SpawnObject(t.world)
+	t.Spawner.SpawnObject(t.world)
 
 	t.spawnTiles()
 	t.spawnDebugTiles()
@@ -79,8 +79,8 @@ func (t *TilemapSystem) Start() {
 }
 
 func (t *TilemapSystem) spawnTiles() {
-	w := t.base.Config.TileMap.Width
-	h := t.base.Config.TileMap.Height
+	w := t.Config.TileMap.Width
+	h := t.Config.TileMap.Height
 
 	desertEndX := engine.RandomRange(w/4, w/2)
 	desertEndY := engine.RandomRange(h/4, h/2)
@@ -93,11 +93,11 @@ func (t *TilemapSystem) spawnTiles() {
 		Y: engine.RandomRange(2, seaStartY-2),
 	}
 
-	for y := 0; y < t.base.Config.TileMap.Height; y++ {
-		for x := 0; x < t.base.Config.TileMap.Width; x++ {
+	for y := 0; y < t.Config.TileMap.Height; y++ {
+		for x := 0; x < t.Config.TileMap.Width; x++ {
 			position := engine.Vector{
-				X: float64(x * t.base.Config.TileMap.TileWidth),
-				Y: float64(y * t.base.Config.TileMap.TileWidth),
+				X: float64(x * t.Config.TileMap.TileWidth),
+				Y: float64(y * t.Config.TileMap.TileWidth),
 			}
 
 			var forestChance int
@@ -136,37 +136,37 @@ func (t *TilemapSystem) spawnTiles() {
 			t.tiles = append(t.tiles, tile)
 			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(position.X, position.Y)
-			t.base.Spawner.SpawnTile(tile)
+			t.Spawner.SpawnTile(tile)
 		}
 	}
 
-	t.highlightedTile = tiles.NewHighlightTile(t.base.Config.TileMap.TileWidth, t.base.Config.TileMap.TileHeight)
+	t.highlightedTile = tiles.NewHighlightTile(t.Config.TileMap.TileWidth, t.Config.TileMap.TileHeight)
 	t.world.GetWorldSpace().AddChild(t.highlightedTile)
-	t.base.Spawner.SpawnTile(t.highlightedTile)
+	t.Spawner.SpawnTile(t.highlightedTile)
 }
 
 func (t *TilemapSystem) spawnDebugTiles() {
-	for y := 0; y < t.base.Config.TileMap.Height; y++ {
-		for x := 0; x < t.base.Config.TileMap.Width; x++ {
+	for y := 0; y < t.Config.TileMap.Height; y++ {
+		for x := 0; x < t.Config.TileMap.Width; x++ {
 			pos := engine.Vector{
-				X: float64(x * t.base.Config.TileMap.TileWidth),
-				Y: float64(y * t.base.Config.TileMap.TileHeight),
+				X: float64(x * t.Config.TileMap.TileWidth),
+				Y: float64(y * t.Config.TileMap.TileHeight),
 			}
-			tile := tiles.NewDebugTile(t.base.Config.TileMap.TileWidth, t.base.Config.TileMap.TileHeight)
+			tile := tiles.NewDebugTile(t.Config.TileMap.TileWidth, t.Config.TileMap.TileHeight)
 			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(pos.X, pos.Y)
 			t.debugTiles = append(t.debugTiles, tile)
-			t.base.Spawner.SpawnTile(tile)
+			t.Spawner.SpawnTile(tile)
 		}
 	}
 }
 
 func (t TilemapSystem) spawnUnits() {
 	unitsX := func(o int) float64 {
-		return float64((t.castlePosition.X+o)*t.base.Config.TileMap.TileWidth + t.base.Config.TileMap.TileWidth/2)
+		return float64((t.castlePosition.X+o)*t.Config.TileMap.TileWidth + t.Config.TileMap.TileWidth/2)
 	}
 	unitsY := func(o int) float64 {
-		return float64((t.castlePosition.Y+o)*t.base.Config.TileMap.TileHeight + t.base.Config.TileMap.TileHeight/2)
+		return float64((t.castlePosition.Y+o)*t.Config.TileMap.TileHeight + t.Config.TileMap.TileHeight/2)
 	}
 
 	spriteGetter := atlasSpriteGetter{}
@@ -174,7 +174,7 @@ func (t TilemapSystem) spawnUnits() {
 	king := units.NewUnit(components.TeamBlue, components.ClassKing, spriteGetter)
 	t.world.GetWorldSpace().AddChild(king)
 	king.GetWorldSpace().Translate(unitsX(0), unitsY(1))
-	t.base.Spawner.SpawnUnit(king)
+	t.Spawner.SpawnUnit(king)
 }
 
 func (t TilemapSystem) Update(_ float64) {

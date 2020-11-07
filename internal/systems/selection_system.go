@@ -15,7 +15,7 @@ type selectionEntity interface {
 }
 
 type SelectionSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	entities EntityList
 
@@ -30,16 +30,19 @@ type EntityUnselected struct {
 	Entity engine.Entity
 }
 
-func NewSelectionSystem(config Config, eventBus *engine.EventBus, spawner spawner) *SelectionSystem {
-	return &SelectionSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+func NewSelectionSystem(base BaseSystem) *SelectionSystem {
+	s := &SelectionSystem{
+		BaseSystem: base,
 	}
+
+	s.EventBus.Subscribe(EntityClicked{}, s)
+	s.EventBus.Subscribe(EntitiesClicked{}, s)
+	s.EventBus.Subscribe(PointClicked{}, s)
+
+	return s
 }
 
 func (s *SelectionSystem) Start() {
-	s.base.EventBus.Subscribe(EntityClicked{}, s)
-	s.base.EventBus.Subscribe(EntitiesClicked{}, s)
-	s.base.EventBus.Subscribe(PointClicked{}, s)
 }
 
 func (s *SelectionSystem) Update(dt float64) {
@@ -82,7 +85,7 @@ func (s *SelectionSystem) selectEntity(e engine.Entity) bool {
 	entity.GetSelectable().Select()
 	s.selectedEntities = append(s.selectedEntities, entity)
 
-	s.base.EventBus.Publish(EntitySelected{
+	s.EventBus.Publish(EntitySelected{
 		Entity: entity,
 	})
 
@@ -96,7 +99,7 @@ func (s *SelectionSystem) unselectCurrentEntities() {
 
 	for _, e := range s.selectedEntities {
 		e.GetSelectable().Unselect()
-		s.base.EventBus.Publish(EntityUnselected{Entity: e})
+		s.EventBus.Publish(EntityUnselected{Entity: e})
 	}
 	s.selectedEntities = nil
 }

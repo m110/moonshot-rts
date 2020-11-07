@@ -34,7 +34,7 @@ type ClickReleased struct {
 }
 
 type ClickingSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	entities []EntityList
 
@@ -43,17 +43,17 @@ type ClickingSystem struct {
 	overlayEnabled bool
 }
 
-func NewClickingSystem(config Config, eventBus *engine.EventBus, spawner spawner) *ClickingSystem {
+func NewClickingSystem(base BaseSystem) *ClickingSystem {
 	return &ClickingSystem{
-		base:     NewBaseSystem(config, eventBus, spawner),
-		entities: make([]EntityList, components.AllLayers),
+		BaseSystem: base,
+		entities:   make([]EntityList, components.AllLayers),
 	}
 }
 
 func (c *ClickingSystem) Start() {
 	c.overlay = objects.NewOverlay(0, 0, engine.PivotTopLeft)
 	c.overlay.GetDrawable().Disable()
-	c.base.Spawner.SpawnDrawingEntity(c.overlay)
+	c.Spawner.SpawnDrawingEntity(c.overlay)
 }
 
 func (c *ClickingSystem) Update(dt float64) {
@@ -61,18 +61,18 @@ func (c *ClickingSystem) Update(dt float64) {
 	position := engine.Vector{X: float64(cx), Y: float64(cy)}
 
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
-		c.base.EventBus.Publish(ClickReleased{})
+		c.EventBus.Publish(ClickReleased{})
 
 		if c.overlayEnabled {
 			c.hideOverlay()
 			entities := c.findAllEntitiesInOverlay()
 			if len(entities) > 0 {
-				c.base.EventBus.Publish(EntitiesClicked{
+				c.EventBus.Publish(EntitiesClicked{
 					Entities: entities,
 				})
 			} else {
 				// TODO should have a dedicated event?
-				c.base.EventBus.Publish(PointClicked{
+				c.EventBus.Publish(PointClicked{
 					Point: position,
 				})
 			}
@@ -82,13 +82,13 @@ func (c *ClickingSystem) Update(dt float64) {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		entity := c.findFirstClickedEntity(position)
 		if entity == nil {
-			c.base.EventBus.Publish(PointClicked{
+			c.EventBus.Publish(PointClicked{
 				Point: position,
 			})
 
 			c.showOverlay(position)
 		} else {
-			c.base.EventBus.Publish(EntityClicked{
+			c.EventBus.Publish(EntityClicked{
 				Entity: entity,
 			})
 		}

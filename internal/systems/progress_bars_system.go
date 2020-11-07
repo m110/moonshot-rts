@@ -1,10 +1,6 @@
 package systems
 
 import (
-	"image"
-
-	"github.com/hajimehoshi/ebiten/v2"
-
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -16,13 +12,13 @@ type progressBarEntity interface {
 }
 
 type ProgressBarSystem struct {
-	base     BaseSystem
+	BaseSystem
 	entities EntityList
 }
 
-func NewProgressBarSystem(config Config, eventBus *engine.EventBus, spawner spawner) *ProgressBarSystem {
+func NewProgressBarSystem(base BaseSystem) *ProgressBarSystem {
 	return &ProgressBarSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 
@@ -39,12 +35,14 @@ func (p ProgressBarSystem) Update(dt float64) {
 func updateProgressBarSprite(entity progressBarEntity) {
 	bar := entity.GetProgressBar()
 
-	entity.GetDrawable().Sprite.Image().Clear()
-	entity.GetDrawable().Sprite.Draw(bar.Background.Full)
+	entity.GetDrawable().Sprite = engine.NewSpriteFromSprite(bar.Background.Full)
 
-	rect := image.Rect(0, 0, int(float64(bar.Background.Full.Width())*bar.Progress), bar.Background.Full.Height())
-	foreground := entity.GetProgressBar().Foreground.Full.Image().SubImage(rect)
-	entity.GetDrawable().Sprite.Image().DrawImage(ebiten.NewImageFromImage(foreground), nil)
+	//rect := image.Rect(0, 0, int(float64(bar.Background.Full.Width())*bar.Progress), bar.Background.Full.Height())
+	// foreground := entity.GetProgressBar().Foreground.Full.Image().SubImage(rect)
+	width := int(float64(bar.Background.Full.Width()) * bar.Progress)
+	foreground := engine.NewBlankSprite(width, bar.Foreground.Full.Height())
+	foreground.Draw(bar.Foreground.Full)
+	entity.GetDrawable().Sprite.Draw(foreground)
 }
 
 func fillProgressBar(sprites components.ProgressBarSprites, midLength int) engine.Sprite {

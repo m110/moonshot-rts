@@ -16,7 +16,7 @@ type unitControlEntity interface {
 }
 
 type UnitControlSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	entities EntityList
 
@@ -35,9 +35,9 @@ type EntityReachedTarget struct {
 	Entity engine.Entity
 }
 
-func NewUnitControlSystem(config Config, eventBus *engine.EventBus, spawner spawner) *UnitControlSystem {
+func NewUnitControlSystem(base BaseSystem) *UnitControlSystem {
 	return &UnitControlSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 
@@ -48,10 +48,10 @@ func (u *UnitControlSystem) Start() {
 	u.buildIcon = atlas.Hammer
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
-	u.base.EventBus.Subscribe(PointClicked{}, u)
-	u.base.EventBus.Subscribe(EntitySelected{}, u)
-	u.base.EventBus.Subscribe(EntityUnselected{}, u)
-	u.base.EventBus.Subscribe(EntityReachedTarget{}, u)
+	u.EventBus.Subscribe(PointClicked{}, u)
+	u.EventBus.Subscribe(EntitySelected{}, u)
+	u.EventBus.Subscribe(EntityUnselected{}, u)
+	u.EventBus.Subscribe(EntityReachedTarget{}, u)
 }
 
 func (u UnitControlSystem) Update(dt float64) {
@@ -109,7 +109,7 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 
 		// TODO set timer
 		building := objects.NewBuilding(pos, buildingType.BuildingType)
-		u.base.Spawner.SpawnBuilding(building)
+		u.Spawner.SpawnBuilding(building)
 
 		delete(u.buildingsQueued, event.Entity.ID())
 	}
@@ -120,7 +120,7 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 		entity := e.(unitControlEntity)
 		if entity.GetMovable().Target != nil {
 			if entity.GetWorldSpace().WorldPosition().Distance(*entity.GetMovable().Target) < 1.0 {
-				u.base.EventBus.Publish(EntityReachedTarget{Entity: entity})
+				u.EventBus.Publish(EntityReachedTarget{Entity: entity})
 				entity.GetMovable().ClearTarget()
 			} else {
 				direction := entity.GetMovable().Target.Sub(entity.GetWorldSpace().WorldPosition()).Normalized()
@@ -143,7 +143,7 @@ func (u *UnitControlSystem) showActionButton() {
 
 	entity.GetWorldSpace().AddChild(button)
 
-	u.base.Spawner.SpawnPanelButton(button)
+	u.Spawner.SpawnPanelButton(button)
 	u.actionButton = &button
 }
 
@@ -152,7 +152,7 @@ func (u *UnitControlSystem) hideActionButton() {
 		return
 	}
 
-	u.base.Spawner.RemovePanelButton(*u.actionButton)
+	u.Spawner.RemovePanelButton(*u.actionButton)
 	u.actionButton = nil
 }
 
@@ -177,7 +177,7 @@ func (u *UnitControlSystem) showActionPanel() {
 	}
 
 	panel := objects.NewFourButtonPanel(configs)
-	u.base.Spawner.SpawnPanel(panel)
+	u.Spawner.SpawnPanel(panel)
 
 	entity.GetWorldSpace().AddChild(panel)
 
@@ -189,7 +189,7 @@ func (u *UnitControlSystem) hideActionsPanel() {
 		return
 	}
 
-	u.base.Spawner.RemovePanel(*u.actionsPanel)
+	u.Spawner.RemovePanel(*u.actionsPanel)
 	u.actionsPanel = nil
 }
 

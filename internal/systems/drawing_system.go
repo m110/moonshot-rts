@@ -15,7 +15,7 @@ type DrawingEntity interface {
 }
 
 type DrawingSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	entities []EntityList
 
@@ -28,16 +28,16 @@ type spriteAtPosition struct {
 	Position engine.Vector
 }
 
-func NewDrawingSystem(config Config, eventBus *engine.EventBus, spawner spawner) *DrawingSystem {
-	canvas := engine.NewSpriteFromImage(ebiten.NewImage(config.WindowSize()))
+func NewDrawingSystem(base BaseSystem) *DrawingSystem {
+	canvas := engine.NewSpriteFromImage(ebiten.NewImage(base.Config.WindowSize()))
 
 	layers := make([][]spriteAtPosition, components.AllLayers)
 
 	return &DrawingSystem{
-		base:     NewBaseSystem(config, eventBus, spawner),
-		entities: make([]EntityList, components.AllLayers),
-		canvas:   canvas,
-		layers:   layers,
+		BaseSystem: base,
+		entities:   make([]EntityList, components.AllLayers),
+		canvas:     canvas,
+		layers:     layers,
 	}
 }
 

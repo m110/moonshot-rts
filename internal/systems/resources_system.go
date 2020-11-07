@@ -10,20 +10,20 @@ type ResourcesUpdated struct {
 }
 
 type ResourcesSystem struct {
-	base BaseSystem
+	BaseSystem
 
 	resources components.Resources
 }
 
-func NewResourcesSystem(config Config, eventBus *engine.EventBus, spawner spawner) *ResourcesSystem {
+func NewResourcesSystem(base BaseSystem) *ResourcesSystem {
 	return &ResourcesSystem{
-		base: NewBaseSystem(config, eventBus, spawner),
+		BaseSystem: base,
 	}
 }
 
 func (r ResourcesSystem) Start() {
 	r.resources = components.Resources{}
-	r.base.EventBus.Publish(ResourcesUpdated{Resources: r.resources})
+	r.EventBus.Publish(ResourcesUpdated{Resources: r.resources})
 }
 
 func (r ResourcesSystem) Update(dt float64) {

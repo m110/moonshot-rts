@@ -44,19 +44,19 @@ func NewGame(config systems.Config) *Game {
 func (g *Game) Start() {
 	g.eventBus = engine.NewEventBus()
 
-	// TODO Refactor the base system - it seems the arguments get repetitive
+	baseSystem := systems.NewBaseSystem(g.config, g.eventBus, g)
 	g.systems = []System{
-		systems.NewTilemapSystem(g.config, g.eventBus, g),
-		systems.NewDrawingSystem(g.config, g.eventBus, g),
-		systems.NewSelectionSystem(g.config, g.eventBus, g),
-		systems.NewUISystem(g.config, g.eventBus, g),
-		systems.NewResourcesSystem(g.config, g.eventBus, g),
-		systems.NewUnitControlSystem(g.config, g.eventBus, g),
-		systems.NewBuildingControlSystem(g.config, g.eventBus, g),
-		systems.NewClickingSystem(g.config, g.eventBus, g),
-		systems.NewButtonsSystem(g.config, g.eventBus, g),
-		systems.NewTimeActionsSystem(g.config, g.eventBus, g),
-		systems.NewProgressBarSystem(g.config, g.eventBus, g),
+		systems.NewTilemapSystem(baseSystem),
+		systems.NewDrawingSystem(baseSystem),
+		systems.NewSelectionSystem(baseSystem),
+		systems.NewUISystem(baseSystem),
+		systems.NewResourcesSystem(baseSystem),
+		systems.NewUnitControlSystem(baseSystem),
+		systems.NewBuildingControlSystem(baseSystem),
+		systems.NewClickingSystem(baseSystem),
+		systems.NewButtonsSystem(baseSystem),
+		systems.NewTimeActionsSystem(baseSystem),
+		systems.NewProgressBarSystem(baseSystem),
 	}
 
 	for _, s := range g.systems {
