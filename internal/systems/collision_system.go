@@ -78,10 +78,15 @@ func (c *CollisionSystem) Update(dt float64) {
 				// No longer collide
 				if !intersects {
 					entity.GetCollider().RemoveCollision(other)
+					other.GetCollider().RemoveCollision(entity)
 
 					c.EventBus.Publish(EntitiesOutOfCollision{
 						Entity: entity,
 						Other:  other,
+					})
+					c.EventBus.Publish(EntitiesOutOfCollision{
+						Entity: other,
+						Other:  entity,
 					})
 				}
 				continue
@@ -105,10 +110,15 @@ func (c *CollisionSystem) Update(dt float64) {
 			}
 
 			entity.GetCollider().AddCollision(other)
+			other.GetCollider().AddCollision(entity)
 
 			c.EventBus.Publish(EntitiesCollided{
 				Entity: entity,
 				Other:  other,
+			})
+			c.EventBus.Publish(EntitiesCollided{
+				Entity: other,
+				Other:  entity,
 			})
 		}
 	}
