@@ -17,6 +17,7 @@ type unitControlEntity interface {
 	components.MovableOwner
 	components.BuilderOwner
 	components.TimeActionsOwner
+	components.ColliderOwner
 }
 
 type tileFinder interface {
@@ -33,7 +34,7 @@ type UnitControlSystem struct {
 
 	buildMode       bool
 	buildingToBuild components.BuilderOption
-	buildingsQueued map[engine.EntityID]components.BuilderOption
+	buildingsQueued map[engine.EntityID]queuedBuilding
 
 	buildIcon    engine.Sprite
 	actionButton *objects.PanelButton
@@ -43,20 +44,25 @@ type UnitControlSystem struct {
 	tileSelectionMode bool
 }
 
+type queuedBuilding struct {
+	DestinationTile tiles.Tile
+	Option          components.BuilderOption
+}
+
 type EntityReachedTarget struct {
 	Entity engine.Entity
 }
 
 func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSystem {
 	u := &UnitControlSystem{
-		BaseSystem: base,
-		tileFinder: tileFinder,
+		BaseSystem:      base,
+		tileFinder:      tileFinder,
+		buildingsQueued: map[engine.EntityID]queuedBuilding{},
 	}
 
 	u.EventBus.Subscribe(PointClicked{}, u)
 	u.EventBus.Subscribe(EntitySelected{}, u)
 	u.EventBus.Subscribe(EntityUnselected{}, u)
-	u.EventBus.Subscribe(EntityReachedTarget{}, u)
 	u.EventBus.Subscribe(EntitiesCollided{}, u)
 	u.EventBus.Subscribe(EntitiesOutOfCollision{}, u)
 
@@ -65,7 +71,6 @@ func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSy
 
 func (u *UnitControlSystem) Start() {
 	u.buildMode = false
-	u.buildingsQueued = map[engine.EntityID]components.BuilderOption{}
 
 	u.buildIcon = atlas.Hammer
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
@@ -112,35 +117,29 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 			}
 
 			if u.buildMode {
-				u.buildingsQueued[entity.ID()] = u.buildingToBuild
+				tile, ok := u.tileFinder.TileAtPosition(event.Point)
+				if !ok {
+					fmt.Println("Tile not found at position", event.Point)
+					return
+				}
+				u.buildingsQueued[entity.ID()] = queuedBuilding{
+					DestinationTile: tile,
+					Option:          u.buildingToBuild,
+				}
 				u.buildMode = false
+
+				if entity.GetCollider().HasCollision(tile) {
+					u.attemptBuildOnCollision(entity, tile)
+				}
 			}
 		}
-	case EntityReachedTarget:
-		buildingType, ok := u.buildingsQueued[event.Entity.ID()]
-		if !ok {
-			return
-		}
-		entity, ok := u.entities.ByID(event.Entity.ID())
-		if !ok {
-			return
-		}
-
-		// TODO this should be based on tiles
-		uce := entity.(unitControlEntity)
-		pos := uce.GetWorldSpace().WorldPosition()
-		pos.Translate(0, -24)
-
-		building := objects.NewBuilding(pos, buildingType.BuildingType)
-		u.Spawner.SpawnBuilding(building)
-
-		delete(u.buildingsQueued, event.Entity.ID())
 	case EntitiesCollided:
 		entity, ok := u.entities.ByID(event.Entity.ID())
 		if !ok {
 			return
 		}
 
+		u.attemptBuildOnCollision(entity, event.Other)
 		fmt.Println(entity, "collides with", event.Other)
 	case EntitiesOutOfCollision:
 		entity, ok := u.entities.ByID(event.Entity.ID())
@@ -243,6 +242,31 @@ func (u *UnitControlSystem) hideActionsPanel() {
 
 	u.Spawner.RemovePanel(*u.actionsPanel)
 	u.actionsPanel = nil
+}
+
+func (u *UnitControlSystem) attemptBuildOnCollision(entity engine.Entity, other engine.Entity) {
+	queued, ok := u.buildingsQueued[entity.ID()]
+	if !ok {
+		return
+	}
+
+	if !queued.DestinationTile.Equals(other) {
+		return
+	}
+
+	uce := entity.(unitControlEntity)
+	uce.GetMovable().ClearTarget()
+
+	buildingPos := engine.Vector{
+		X: float64(u.Config.TileMap.TileWidth) / 2.0,
+		Y: float64(u.Config.TileMap.TileHeight),
+	}
+
+	building := objects.NewBuilding(buildingPos, queued.Option.BuildingType)
+	queued.DestinationTile.GetWorldSpace().AddChild(building)
+	u.Spawner.SpawnBuilding(building)
+
+	delete(u.buildingsQueued, entity.ID())
 }
 
 func (u *UnitControlSystem) Add(entity unitControlEntity) {
