@@ -103,12 +103,12 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 	case EntityUnselected:
 		u.activeEntities.Remove(event.Entity)
 		u.tileSelectionMode = false
+		u.buildMode = false
 		u.hideActionButton()
 		u.hideActionsPanel()
 	case PointClicked:
 		for _, e := range u.activeEntities.All() {
 			entity := e.(unitControlEntity)
-			entity.GetMovable().SetTarget(event.Point)
 
 			_, ok := u.buildingsQueued[entity.ID()]
 			if ok {
@@ -122,16 +122,24 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 					fmt.Println("Tile not found at position", event.Point)
 					return
 				}
+
+				u.buildMode = false
+
+				if !canBuildOnTile(tile) {
+					return
+				}
+
 				u.buildingsQueued[entity.ID()] = queuedBuilding{
 					DestinationTile: tile,
 					Option:          u.buildingToBuild,
 				}
-				u.buildMode = false
 
 				if entity.GetCollider().HasCollision(tile) {
 					u.attemptBuildOnCollision(entity, tile)
 				}
 			}
+
+			entity.GetMovable().SetTarget(event.Point)
 		}
 	case EntitiesCollided:
 		entity, ok := u.entities.ByID(event.Entity.ID())
@@ -153,12 +161,13 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 func (u *UnitControlSystem) moveEntities(dt float64) {
 	for _, e := range u.entities.All() {
 		entity := e.(unitControlEntity)
-		if entity.GetMovable().Target != nil {
-			if entity.GetWorldSpace().WorldPosition().Distance(*entity.GetMovable().Target) < 1.0 {
+		movable := entity.GetMovable()
+		if movable.Disabled || movable.Target != nil {
+			if entity.GetWorldSpace().WorldPosition().Distance(*movable.Target) < 1.0 {
 				u.EventBus.Publish(EntityReachedTarget{Entity: entity})
-				entity.GetMovable().ClearTarget()
+				movable.ClearTarget()
 			} else {
-				direction := entity.GetMovable().Target.Sub(entity.GetWorldSpace().WorldPosition()).Normalized()
+				direction := movable.Target.Sub(entity.GetWorldSpace().WorldPosition()).Normalized()
 				entity.GetWorldSpace().Translate(direction.Mul(50 * dt).Unpack())
 			}
 		}
@@ -267,6 +276,11 @@ func (u *UnitControlSystem) attemptBuildOnCollision(entity engine.Entity, other 
 	u.Spawner.SpawnBuilding(building)
 
 	delete(u.buildingsQueued, entity.ID())
+}
+
+func canBuildOnTile(tile tiles.Tile) bool {
+	// TODO ?
+	return len(tile.GetWorldSpace().Children) == 0
 }
 
 func (u *UnitControlSystem) Add(entity unitControlEntity) {

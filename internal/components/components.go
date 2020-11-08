@@ -22,7 +22,16 @@ func (s *Selectable) Unselect() {
 }
 
 type Movable struct {
-	Target *engine.Vector
+	Target   *engine.Vector
+	Disabled bool
+}
+
+func (m *Movable) Enable() {
+	m.Disabled = false
+}
+
+func (m *Movable) Disable() {
+	m.Disabled = true
 }
 
 func (m *Movable) ClearTarget() {
