@@ -82,7 +82,7 @@ func (b *BuildingControlSystem) HandleEvent(e engine.Event) {
 	case EntityUnselected:
 		if b.activeBuilding != nil && event.Entity.Equals(b.activeBuilding) {
 			b.activeBuilding = nil
-			b.Spawner.RemovePanel(*b.buildPanel)
+			b.Spawner.Destroy(*b.buildPanel)
 			b.buildPanel = nil
 		}
 	}
@@ -110,7 +110,7 @@ func (b *BuildingControlSystem) ShowBuildPanel() {
 		})
 	}
 	buildPanel := objects.NewFourButtonPanel(configs)
-	b.Spawner.SpawnPanel(buildPanel)
+	b.Spawner.Spawn(buildPanel)
 
 	pos := b.activeBuilding.GetWorldSpace().WorldPosition()
 	buildPanel.GetWorldSpace().SetInWorld(pos.X, pos.Y)
@@ -153,7 +153,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 				// TODO casting to concrete struct is a hack, there should be a better way to do this
 				p, ok := c.(objects.ProgressBar)
 				if ok {
-					b.Spawner.RemoveProgressBar(p)
+					b.Spawner.Destroy(p)
 					// TODO A RemoveChild is missing here. Not trivial for now, and despawning should work fine
 				}
 			}
@@ -166,7 +166,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 
 func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 	progressBar := objects.NewHorizontalProgressBar()
-	b.Spawner.SpawnProgressBar(progressBar)
+	b.Spawner.Spawn(progressBar)
 	entity.GetWorldSpace().AddChild(progressBar)
 	// TODO better position
 	progressBar.GetWorldSpace().Translate(0, -30)
@@ -174,7 +174,7 @@ func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 
 func (b *BuildingControlSystem) spawnUnit(spawnPosition engine.Vector, team components.Team, class components.Class) {
 	unit := units.NewUnit(team, class, atlasSpriteGetter{})
-	b.Spawner.SpawnUnit(unit)
+	b.Spawner.Spawn(unit)
 
 	unit.GetWorldSpace().SetInWorld(spawnPosition.X, spawnPosition.Y)
 

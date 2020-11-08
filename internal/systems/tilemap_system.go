@@ -63,7 +63,7 @@ func (t *TilemapSystem) Start() {
 		float64(t.Config.TileMap.OffsetY),
 	)
 
-	t.Spawner.SpawnObject(t.world)
+	t.Spawner.Spawn(t.world)
 
 	t.spawnTiles()
 	t.spawnDebugTiles()
@@ -128,7 +128,7 @@ func (t *TilemapSystem) spawnTiles() {
 			t.tiles = append(t.tiles, tile)
 			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(position.X, position.Y)
-			t.Spawner.SpawnTile(tile)
+			t.Spawner.Spawn(tile)
 		}
 	}
 
@@ -145,7 +145,7 @@ func (t *TilemapSystem) spawnDebugTiles() {
 			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(pos.X, pos.Y)
 			t.debugTiles = append(t.debugTiles, tile)
-			t.Spawner.SpawnObject(tile)
+			t.Spawner.Spawn(tile)
 		}
 	}
 }
@@ -163,7 +163,7 @@ func (t TilemapSystem) spawnUnits() {
 	king := units.NewUnit(components.TeamBlue, components.ClassKing, spriteGetter)
 	t.world.GetWorldSpace().AddChild(king)
 	king.GetWorldSpace().Translate(unitsX(0), unitsY(1))
-	t.Spawner.SpawnUnit(king)
+	t.Spawner.Spawn(king)
 }
 
 func (t TilemapSystem) Update(_ float64) {

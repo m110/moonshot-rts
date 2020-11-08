@@ -53,7 +53,7 @@ func NewClickingSystem(base BaseSystem) *ClickingSystem {
 func (c *ClickingSystem) Start() {
 	c.overlay = objects.NewOverlay(1, 1, engine.PivotTopLeft)
 	c.overlay.GetDrawable().Disable()
-	c.Spawner.SpawnDrawingEntity(c.overlay)
+	c.Spawner.Spawn(c.overlay)
 }
 
 func (c *ClickingSystem) Update(dt float64) {

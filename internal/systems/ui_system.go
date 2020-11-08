@@ -55,7 +55,7 @@ func (u *UISystem) Start() {
 	ui.GetWorldSpace().AddChild(u.fps)
 	u.fps.Translate(float64(u.Config.UI.Width-200), 20)
 
-	u.Spawner.SpawnObject(ui)
+	u.Spawner.Spawn(ui)
 }
 
 func (u UISystem) updateResources(resources components.Resources) {

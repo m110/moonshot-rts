@@ -80,7 +80,7 @@ func (u *UnitControlSystem) Start() {
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
 	u.highlightedTile = tiles.NewHighlightTile(u.Config.TileMap.TileWidth, u.Config.TileMap.TileHeight)
-	u.Spawner.SpawnObject(u.highlightedTile)
+	u.Spawner.Spawn(u.highlightedTile)
 }
 
 func (u UnitControlSystem) Update(dt float64) {
@@ -209,7 +209,7 @@ func (u *UnitControlSystem) showActionButton() {
 
 	entity.GetWorldSpace().AddChild(button)
 
-	u.Spawner.SpawnPanelButton(button)
+	u.Spawner.Spawn(button)
 	u.actionButton = &button
 }
 
@@ -218,7 +218,7 @@ func (u *UnitControlSystem) hideActionButton() {
 		return
 	}
 
-	u.Spawner.RemovePanelButton(*u.actionButton)
+	u.Spawner.Destroy(*u.actionButton)
 	u.actionButton = nil
 }
 
@@ -243,7 +243,7 @@ func (u *UnitControlSystem) showActionPanel() {
 	}
 
 	panel := objects.NewFourButtonPanel(configs)
-	u.Spawner.SpawnPanel(panel)
+	u.Spawner.Spawn(panel)
 
 	entity.GetWorldSpace().AddChild(panel)
 
@@ -255,7 +255,7 @@ func (u *UnitControlSystem) hideActionsPanel() {
 		return
 	}
 
-	u.Spawner.RemovePanel(*u.actionsPanel)
+	u.Spawner.Destroy(*u.actionsPanel)
 	u.actionsPanel = nil
 }
 
@@ -279,7 +279,7 @@ func (u *UnitControlSystem) attemptBuildOnCollision(entity engine.Entity, other 
 
 	building := objects.NewBuilding(buildingPos, queued.Option.BuildingType)
 	queued.DestinationTile.GetWorldSpace().AddChild(building)
-	u.Spawner.SpawnBuilding(building)
+	u.Spawner.Spawn(building)
 
 	delete(u.buildingsQueued, entity.ID())
 }
