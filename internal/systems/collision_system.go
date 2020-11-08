@@ -37,22 +37,25 @@ type EntitiesOutOfCollision struct {
 
 type CollisionSystem struct {
 	BaseSystem
-	entities EntityList
+	entities              EntityMap
+	recentlyMovedEntities EntityList
 }
 
 func NewCollisionSystem(base BaseSystem) *CollisionSystem {
-	return &CollisionSystem{
+	c := &CollisionSystem{
 		BaseSystem: base,
 	}
+
+	c.EventBus.Subscribe(EntityMoved{}, c)
+
+	return c
 }
 
 func (c CollisionSystem) Start() {
 }
 
 func (c *CollisionSystem) Update(dt float64) {
-	// TODO This is probably not a good idea performance-wise
-	// Could skip already checked entities in a smarter way?
-	for _, e := range c.entities.All() {
+	for _, e := range c.recentlyMovedEntities.All() {
 		for _, o := range c.entities.All() {
 			entity := e.(collisionEntity)
 			other := o.(collisionEntity)
@@ -109,10 +112,25 @@ func (c *CollisionSystem) Update(dt float64) {
 			})
 		}
 	}
+
+	c.recentlyMovedEntities.Clear()
+}
+
+func (c *CollisionSystem) HandleEvent(e engine.Event) {
+	switch event := e.(type) {
+	case EntityMoved:
+		_, ok := c.entities.ByID(event.Entity.ID())
+		if !ok {
+			return
+		}
+
+		c.recentlyMovedEntities.Add(event.Entity)
+	}
 }
 
 func (c *CollisionSystem) Add(entity collisionEntity) {
 	c.entities.Add(entity)
+	c.recentlyMovedEntities.Add(entity)
 }
 
 func (c *CollisionSystem) Remove(entity engine.Entity) {

@@ -53,6 +53,10 @@ type EntityReachedTarget struct {
 	Entity engine.Entity
 }
 
+type EntityMoved struct {
+	Entity engine.Entity
+}
+
 func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSystem {
 	u := &UnitControlSystem{
 		BaseSystem:      base,
@@ -136,6 +140,7 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 
 				if entity.GetCollider().HasCollision(tile) {
 					u.attemptBuildOnCollision(entity, tile)
+					return
 				}
 			}
 
@@ -169,6 +174,7 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 			} else {
 				direction := movable.Target.Sub(entity.GetWorldSpace().WorldPosition()).Normalized()
 				entity.GetWorldSpace().Translate(direction.Mul(50 * dt).Unpack())
+				u.EventBus.Publish(EntityMoved{Entity: entity})
 			}
 		}
 	}
