@@ -10,4 +10,5 @@ type Tile struct {
 	*components.WorldSpace
 	*components.Drawable
 	*components.Clickable
+	*components.Collider
 }

@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/m110/moonshot-rts/internal/atlas"
 	"github.com/m110/moonshot-rts/internal/components"
@@ -37,7 +39,7 @@ type UnitControlSystem struct {
 	actionButton *objects.PanelButton
 	actionsPanel *objects.Panel
 
-	highlightedTile   tiles.Tile
+	highlightedTile   objects.Object
 	tileSelectionMode bool
 }
 
@@ -55,6 +57,8 @@ func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSy
 	u.EventBus.Subscribe(EntitySelected{}, u)
 	u.EventBus.Subscribe(EntityUnselected{}, u)
 	u.EventBus.Subscribe(EntityReachedTarget{}, u)
+	u.EventBus.Subscribe(EntitiesCollided{}, u)
+	u.EventBus.Subscribe(EntitiesOutOfCollision{}, u)
 
 	return u
 }
@@ -67,7 +71,7 @@ func (u *UnitControlSystem) Start() {
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
 	u.highlightedTile = tiles.NewHighlightTile(u.Config.TileMap.TileWidth, u.Config.TileMap.TileHeight)
-	u.Spawner.SpawnTile(u.highlightedTile)
+	u.Spawner.SpawnObject(u.highlightedTile)
 }
 
 func (u UnitControlSystem) Update(dt float64) {
@@ -127,11 +131,23 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 		pos := uce.GetWorldSpace().WorldPosition()
 		pos.Translate(0, -24)
 
-		// TODO set timer
 		building := objects.NewBuilding(pos, buildingType.BuildingType)
 		u.Spawner.SpawnBuilding(building)
 
 		delete(u.buildingsQueued, event.Entity.ID())
+	case EntitiesCollided:
+		entity, ok := u.entities.ByID(event.Entity.ID())
+		if !ok {
+			return
+		}
+
+		fmt.Println(entity, "collides with", event.Other)
+	case EntitiesOutOfCollision:
+		entity, ok := u.entities.ByID(event.Entity.ID())
+		if !ok {
+			return
+		}
+		fmt.Println(entity, "out of collision with", event.Other)
 	}
 }
 

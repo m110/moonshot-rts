@@ -12,6 +12,7 @@ type Building struct {
 	Object
 	*components.Selectable
 	*components.Clickable
+	*components.Collider
 	*components.UnitSpawner
 	*components.TimeActions
 }
@@ -60,7 +61,12 @@ func NewBuilding(position engine.Vector, buildingType components.BuildingType) B
 			Overlay: overlay,
 		},
 		Clickable: &components.Clickable{
+			// TODO This should be bottom + top sprite
 			Bounds: components.BoundsFromSprite(bottomSprite),
+		},
+		Collider: &components.Collider{
+			Bounds: components.BoundsFromSprite(bottomSprite),
+			Layer:  components.CollisionLayerBuildings,
 		},
 		UnitSpawner: &components.UnitSpawner{
 			Options: options,

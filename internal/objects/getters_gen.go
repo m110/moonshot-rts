@@ -10,6 +10,10 @@ func (b Building) GetClickable() *components.Clickable {
 	return b.Clickable
 }
 
+func (b Building) GetCollider() *components.Collider {
+	return b.Collider
+}
+
 func (b Building) GetUnitSpawner() *components.UnitSpawner {
 	return b.UnitSpawner
 }

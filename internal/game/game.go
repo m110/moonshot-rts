@@ -61,6 +61,7 @@ func (g *Game) Start() {
 		systems.NewButtonsSystem(baseSystem),
 		systems.NewTimeActionsSystem(baseSystem),
 		systems.NewProgressBarSystem(baseSystem),
+		systems.NewCollisionSystem(baseSystem),
 	}
 
 	for _, s := range g.systems {
@@ -112,6 +113,8 @@ func (g *Game) SpawnTile(tile tiles.Tile) {
 					system.Add(d)
 				}
 			}
+		case *systems.CollisionSystem:
+			system.Add(tile)
 		}
 	}
 
@@ -143,6 +146,8 @@ func (g *Game) SpawnBuilding(building objects.Building) {
 			system.Add(building)
 		case *systems.TimeActionsSystem:
 			system.Add(building)
+		case *systems.CollisionSystem:
+			system.Add(building)
 		}
 	}
 }
@@ -165,6 +170,8 @@ func (g *Game) SpawnUnit(unit units.Unit) {
 		case *systems.ClickingSystem:
 			system.Add(unit)
 		case *systems.TimeActionsSystem:
+			system.Add(unit)
+		case *systems.CollisionSystem:
 			system.Add(unit)
 		}
 	}

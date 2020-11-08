@@ -12,6 +12,10 @@ type ClickableOwner interface {
 	GetClickable() *Clickable
 }
 
+type ColliderOwner interface {
+	GetCollider() *Collider
+}
+
 type DrawableOwner interface {
 	GetDrawable() *Drawable
 }

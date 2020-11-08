@@ -26,6 +26,10 @@ func (u Unit) GetClickable() *components.Clickable {
 	return u.Clickable
 }
 
+func (u Unit) GetCollider() *components.Collider {
+	return u.Collider
+}
+
 func (u Unit) GetBuilder() *components.Builder {
 	return u.Builder
 }

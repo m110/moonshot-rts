@@ -1,6 +1,9 @@
 package engine
 
-import "sync/atomic"
+import (
+	"fmt"
+	"sync/atomic"
+)
 
 type EntityID int64
 
@@ -33,6 +36,6 @@ func (e BaseEntity) Equals(other Entity) bool {
 	return e.ID() == other.ID()
 }
 
-func (e *BaseEntity) Base() *BaseEntity {
-	return e
+func (e *BaseEntity) String() string {
+	return fmt.Sprintf("Entity [%v]", e.id)
 }

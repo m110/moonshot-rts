@@ -13,3 +13,7 @@ func (t Tile) GetDrawable() *components.Drawable {
 func (t Tile) GetClickable() *components.Clickable {
 	return t.Clickable
 }
+
+func (t Tile) GetCollider() *components.Collider {
+	return t.Collider
+}

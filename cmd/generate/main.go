@@ -55,6 +55,7 @@ var allComponents = []interface{}{
 	components.Builder{},
 	components.Button{},
 	components.Clickable{},
+	components.Collider{},
 	components.Drawable{},
 	components.Movable{},
 	components.ProgressBar{},

@@ -38,6 +38,10 @@ func NewGroundTile(groundType GroundType) Tile {
 		Clickable: &components.Clickable{
 			Bounds: components.BoundsFromSprite(sprite),
 		},
+		Collider: &components.Collider{
+			Bounds: components.BoundsFromSprite(sprite),
+			Layer:  components.CollisionLayerGround,
+		},
 	}
 }
 

@@ -39,7 +39,7 @@ type TilemapSystem struct {
 	world objects.Object
 
 	tiles      []tiles.Tile
-	debugTiles []tiles.Tile
+	debugTiles []objects.Object
 
 	castlePosition engine.Point
 }
@@ -145,7 +145,7 @@ func (t *TilemapSystem) spawnDebugTiles() {
 			t.world.GetWorldSpace().AddChild(tile)
 			tile.GetWorldSpace().Translate(pos.X, pos.Y)
 			t.debugTiles = append(t.debugTiles, tile)
-			t.Spawner.SpawnTile(tile)
+			t.Spawner.SpawnObject(tile)
 		}
 	}
 }

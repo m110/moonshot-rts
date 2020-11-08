@@ -16,6 +16,7 @@ type Unit struct {
 	*components.Movable
 	*components.Selectable
 	*components.Clickable
+	*components.Collider
 	*components.Builder
 	*components.TimeActions
 }
@@ -70,6 +71,10 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 		&components.Clickable{
 			Bounds:    components.BoundsFromSprite(sprite),
 			ByOverlay: true,
+		},
+		&components.Collider{
+			Bounds: components.BoundsFromSprite(sprite),
+			Layer:  components.CollisionLayerUnits,
 		},
 		&components.Builder{
 			Options: options,
