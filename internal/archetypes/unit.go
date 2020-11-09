@@ -1,11 +1,10 @@
-package units
+package archetypes
 
 import (
 	"time"
 
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
 )
 
 type Unit struct {
@@ -28,7 +27,7 @@ type spriteGetter interface {
 func NewUnit(team components.Team, class components.Class, spriteGetter spriteGetter) Unit {
 	sprite := spriteGetter.SpriteForUnit(team, class)
 	w, h := sprite.Size()
-	overlay := objects.NewOverlay(w+20, h+20, engine.PivotBottom)
+	overlay := NewOverlay(w+20, h+20, engine.PivotBottom)
 
 	var options []components.BuilderOption
 	switch class {

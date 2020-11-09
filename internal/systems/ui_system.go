@@ -2,12 +2,12 @@ package systems
 
 import (
 	"fmt"
+	"github.com/m110/moonshot-rts/internal/archetypes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
 	"golang.org/x/image/colornames"
 	"golang.org/x/image/font"
 )
@@ -25,8 +25,8 @@ type UIConfig struct {
 type UISystem struct {
 	BaseSystem
 
-	resources objects.Object
-	fps       objects.Object
+	resources archetypes.Object
+	fps       archetypes.Object
 }
 
 func NewUISystem(base BaseSystem) *UISystem {
@@ -39,19 +39,19 @@ func (u *UISystem) Start() {
 	u.EventBus.Subscribe(ResourcesUpdated{}, u)
 
 	sprite := engine.NewFilledSprite(u.Config.UI.Width, u.Config.UI.Height, colornames.Black)
-	ui := objects.NewObject(sprite, components.UILayerBackground)
+	ui := archetypes.NewObject(sprite, components.UILayerBackground)
 	ui.Translate(
 		float64(u.Config.UI.OffsetX),
 		float64(u.Config.UI.OffsetY),
 	)
 
 	resourcesSprite := engine.NewBlankSprite(u.Config.UI.Width, u.Config.UI.Height)
-	u.resources = objects.NewObject(resourcesSprite, components.UILayerText)
+	u.resources = archetypes.NewObject(resourcesSprite, components.UILayerText)
 	ui.GetWorldSpace().AddChild(u.resources)
 	u.resources.Translate(20, 20)
 
 	fpsSprite := engine.NewBlankSprite(200, u.Config.UI.Height)
-	u.fps = objects.NewObject(fpsSprite, components.UILayerText)
+	u.fps = archetypes.NewObject(fpsSprite, components.UILayerText)
 	ui.GetWorldSpace().AddChild(u.fps)
 	u.fps.Translate(float64(u.Config.UI.Width-200), 20)
 

@@ -1,7 +1,7 @@
-package objects
+package archetypes
 
 import (
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -26,18 +26,18 @@ func NewMountain(mountainType MountainType) Mountain {
 		size := engine.RandomRange(0, 3)
 		switch size {
 		case 0:
-			sprite = atlas.StoneSmall
+			sprite = sprites.StoneSmall
 		case 1:
-			sprite = atlas.StoneBig
+			sprite = sprites.StoneBig
 		case 2:
-			sprite = atlas.StoneTwo
+			sprite = sprites.StoneTwo
 		case 3:
-			sprite = atlas.StoneThree
+			sprite = sprites.StoneThree
 		}
 	case MountainGold:
-		sprite = atlas.GoldThree
+		sprite = sprites.GoldThree
 	case MountainIron:
-		sprite = atlas.IronThree
+		sprite = sprites.IronThree
 	}
 
 	return Mountain{

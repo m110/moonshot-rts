@@ -1,4 +1,4 @@
-package atlas
+package sprites
 
 import (
 	"encoding/xml"

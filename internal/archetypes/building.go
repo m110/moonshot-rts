@@ -1,9 +1,9 @@
-package objects
+package archetypes
 
 import (
 	"time"
 
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -88,15 +88,15 @@ func NewBuilding(position engine.Vector, buildingType components.BuildingType) B
 func SpritesForBuilding(buildingType components.BuildingType) (bottomSprite engine.Sprite, topSprite engine.Sprite) {
 	switch buildingType {
 	case components.BuildingSettlement:
-		return atlas.Castle, atlas.CastleTop
+		return sprites.Castle, sprites.CastleTop
 	case components.BuildingBarracks:
-		return atlas.Barracks, atlas.BarracksTop
+		return sprites.Barracks, sprites.BarracksTop
 	case components.BuildingChapel:
-		return atlas.Chapel, atlas.ChapelTop
+		return sprites.Chapel, sprites.ChapelTop
 	case components.BuildingForge:
-		return atlas.Forge, engine.Sprite{}
+		return sprites.Forge, engine.Sprite{}
 	case components.BuildingTower:
-		return atlas.Tower, atlas.TowerTop
+		return sprites.Tower, sprites.TowerTop
 	}
 
 	return engine.Sprite{}, engine.Sprite{}

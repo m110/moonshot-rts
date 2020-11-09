@@ -1,10 +1,9 @@
 package systems
 
 import (
+	"github.com/m110/moonshot-rts/internal/archetypes"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
-	"github.com/m110/moonshot-rts/internal/units"
 )
 
 type buildingControlEntity interface {
@@ -20,9 +19,9 @@ type BuildingControlSystem struct {
 
 	activeBuilding buildingControlEntity
 
-	buildPanel *objects.Panel
+	buildPanel *archetypes.Panel
 
-	spawnedUnits []units.Unit
+	spawnedUnits []archetypes.Unit
 }
 
 func NewBuildingControlSystem(base BaseSystem) *BuildingControlSystem {
@@ -60,7 +59,7 @@ func (b *BuildingControlSystem) Update(dt float64) {
 			timer.Update(dt)
 			for _, c := range e.(buildingControlEntity).GetWorldSpace().Children {
 				// TODO casting to concrete struct is a hack, there should be a better way to do this
-				p, ok := c.(objects.ProgressBar)
+				p, ok := c.(archetypes.ProgressBar)
 				if ok {
 					p.SetProgress(timer.PercentDone())
 				}
@@ -100,16 +99,16 @@ func (b *BuildingControlSystem) ShowBuildPanel() {
 	// TODO get this from a component
 	team := components.TeamBlue
 
-	var configs []objects.ButtonConfig
+	var configs []archetypes.ButtonConfig
 	for i := range spawner.GetUnitSpawner().Options {
 		o := spawner.GetUnitSpawner().Options[i]
 
-		configs = append(configs, objects.ButtonConfig{
+		configs = append(configs, archetypes.ButtonConfig{
 			Sprite: getter.SpriteForUnit(team, o.Class),
 			Action: func() { b.startSpawningUnit(o) },
 		})
 	}
-	buildPanel := objects.NewFourButtonPanel(configs)
+	buildPanel := archetypes.NewFourButtonPanel(configs)
 	b.Spawner.Spawn(buildPanel)
 
 	pos := b.activeBuilding.GetWorldSpace().WorldPosition()
@@ -151,7 +150,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 
 			for _, c := range entity.GetWorldSpace().Children {
 				// TODO casting to concrete struct is a hack, there should be a better way to do this
-				p, ok := c.(objects.ProgressBar)
+				p, ok := c.(archetypes.ProgressBar)
 				if ok {
 					b.Spawner.Destroy(p)
 					// TODO A RemoveChild is missing here. Not trivial for now, and despawning should work fine
@@ -165,7 +164,7 @@ func (b *BuildingControlSystem) addSpawnUnitTimer(entity buildingControlEntity) 
 }
 
 func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
-	progressBar := objects.NewHorizontalProgressBar()
+	progressBar := archetypes.NewHorizontalProgressBar()
 	b.Spawner.Spawn(progressBar)
 	entity.GetWorldSpace().AddChild(progressBar)
 	// TODO better position
@@ -173,7 +172,7 @@ func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 }
 
 func (b *BuildingControlSystem) spawnUnit(spawnPosition engine.Vector, team components.Team, class components.Class) {
-	unit := units.NewUnit(team, class, atlasSpriteGetter{})
+	unit := archetypes.NewUnit(team, class, atlasSpriteGetter{})
 	b.Spawner.Spawn(unit)
 
 	unit.GetWorldSpace().SetInWorld(spawnPosition.X, spawnPosition.Y)

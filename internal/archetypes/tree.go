@@ -1,7 +1,7 @@
-package objects
+package archetypes
 
 import (
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -17,15 +17,15 @@ func NewTree(treeType TreeType) Tree {
 	switch treeType {
 	case TreeStandard:
 		if size == 0 {
-			sprite = atlas.TreeBig
+			sprite = sprites.TreeBig
 		} else {
-			sprite = atlas.TreeSmall
+			sprite = sprites.TreeSmall
 		}
 	case TreePine:
 		if size == 0 {
-			sprite = atlas.PineBig
+			sprite = sprites.PineBig
 		} else {
-			sprite = atlas.PineSmall
+			sprite = sprites.PineSmall
 		}
 	}
 

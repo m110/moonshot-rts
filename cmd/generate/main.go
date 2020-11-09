@@ -8,10 +8,9 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/m110/moonshot-rts/internal/archetypes"
+	"github.com/m110/moonshot-rts/internal/archetypes/tiles"
 	"github.com/m110/moonshot-rts/internal/components"
-	"github.com/m110/moonshot-rts/internal/objects"
-	"github.com/m110/moonshot-rts/internal/tiles"
-	"github.com/m110/moonshot-rts/internal/units"
 )
 
 const rootPkg = "github.com/m110/moonshot-rts/"
@@ -40,15 +39,15 @@ type componentData struct {
 	TypeName string
 }
 
-var archetypes = []interface{}{
-	objects.Building{},
-	objects.Object{},
-	objects.Overlay{},
-	objects.Panel{},
-	objects.PanelButton{},
-	objects.ProgressBar{},
+var allArchetypes = []interface{}{
+	archetypes.Building{},
+	archetypes.Object{},
+	archetypes.Overlay{},
+	archetypes.Panel{},
+	archetypes.PanelButton{},
+	archetypes.ProgressBar{},
 	tiles.Tile{},
-	units.Unit{},
+	archetypes.Unit{},
 }
 
 var allComponents = []interface{}{
@@ -74,7 +73,7 @@ func main() {
 		panic(err)
 	}
 
-	for _, s := range archetypes {
+	for _, s := range allArchetypes {
 		t := reflect.TypeOf(s)
 
 		pkg := strings.Replace(t.PkgPath(), rootPkg, "", 1)

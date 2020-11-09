@@ -1,9 +1,8 @@
 package systems
 
 import (
+	"github.com/m110/moonshot-rts/internal/archetypes"
 	"math"
-
-	"github.com/m110/moonshot-rts/internal/objects"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -38,7 +37,7 @@ type ClickingSystem struct {
 
 	entities []EntityList
 
-	overlay        objects.Overlay
+	overlay        archetypes.Overlay
 	overlayAnchor  engine.Vector
 	overlayEnabled bool
 }
@@ -51,7 +50,7 @@ func NewClickingSystem(base BaseSystem) *ClickingSystem {
 }
 
 func (c *ClickingSystem) Start() {
-	c.overlay = objects.NewOverlay(1, 1, engine.PivotTopLeft)
+	c.overlay = archetypes.NewOverlay(1, 1, engine.PivotTopLeft)
 	c.overlay.GetDrawable().Disable()
 	c.Spawner.Spawn(c.overlay)
 }
@@ -180,7 +179,7 @@ func (c *ClickingSystem) updateOverlay(cursor engine.Vector) {
 		c.overlay.Size.Height = 1
 	}
 
-	c.overlay.Drawable.Sprite = objects.NewRectangleSprite(c.overlay, engine.PivotTopLeft)
+	c.overlay.Drawable.Sprite = archetypes.NewRectangleSprite(c.overlay, engine.PivotTopLeft)
 }
 
 func (c *ClickingSystem) hideOverlay() {

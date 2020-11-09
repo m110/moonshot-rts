@@ -3,10 +3,10 @@ package tiles
 import (
 	"math/rand"
 
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/archetypes"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
 )
 
 type GroundType int
@@ -21,11 +21,11 @@ func NewGroundTile(groundType GroundType) Tile {
 	var sprite engine.Sprite
 	switch groundType {
 	case GroundGrass:
-		sprite = atlas.Grass1
+		sprite = sprites.Grass1
 	case GroundSand:
-		sprite = atlas.Sand1
+		sprite = sprites.Sand1
 	case GroundSea:
-		sprite = atlas.Water1
+		sprite = sprites.Water1
 	}
 
 	return Tile{
@@ -61,7 +61,7 @@ func NewForestTile(groundType GroundType, forestType ForestType) Tile {
 	for i := 0; i <= treesCount; i++ {
 		y += engine.RandomRange(5, 10)
 
-		tree := objects.NewTree(forestToTripType(forestType))
+		tree := archetypes.NewTree(forestToTripType(forestType))
 		t.GetWorldSpace().AddChild(tree)
 		tree.Translate(
 			float64(rand.Intn(50)+5),
@@ -72,25 +72,25 @@ func NewForestTile(groundType GroundType, forestType ForestType) Tile {
 	return t
 }
 
-func forestToTripType(forestType ForestType) objects.TreeType {
+func forestToTripType(forestType ForestType) archetypes.TreeType {
 	switch forestType {
 	case ForestStandard:
-		return objects.TreeStandard
+		return archetypes.TreeStandard
 	case ForestPine:
-		return objects.TreePine
+		return archetypes.TreePine
 	case ForestMixed:
 		r := engine.RandomRange(0, 1)
 		if r == 0 {
-			return objects.TreeStandard
+			return archetypes.TreeStandard
 		} else {
-			return objects.TreePine
+			return archetypes.TreePine
 		}
 	default:
-		return objects.TreeStandard
+		return archetypes.TreeStandard
 	}
 }
 
-func NewMountainsTile(groundType GroundType, mountainType objects.MountainType) Tile {
+func NewMountainsTile(groundType GroundType, mountainType archetypes.MountainType) Tile {
 	t := NewGroundTile(groundType)
 
 	width := int(t.Clickable.Bounds.Width)
@@ -98,7 +98,7 @@ func NewMountainsTile(groundType GroundType, mountainType objects.MountainType) 
 	widthOffset := width / 4.0
 	heightOffset := height / 4.0
 
-	mountain := objects.NewMountain(mountainType)
+	mountain := archetypes.NewMountain(mountainType)
 	mountain.GetWorldSpace().SetLocal(
 		float64(engine.RandomRange(widthOffset, width-widthOffset)),
 		float64(engine.RandomRange(heightOffset, height-heightOffset)),
@@ -116,7 +116,7 @@ func NewBuildingTile(groundType GroundType, buildingType components.BuildingType
 		Y: t.Clickable.Bounds.Height,
 	}
 
-	building := objects.NewBuilding(buildingPos, buildingType)
+	building := archetypes.NewBuilding(buildingPos, buildingType)
 	t.GetWorldSpace().AddChild(building)
 
 	return t

@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/archetypes"
+	"github.com/m110/moonshot-rts/internal/archetypes/tiles"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
-	"github.com/m110/moonshot-rts/internal/tiles"
 )
 
 type unitControlEntity interface {
@@ -37,10 +37,10 @@ type UnitControlSystem struct {
 	buildingsQueued map[engine.EntityID]queuedBuilding
 
 	buildIcon    engine.Sprite
-	actionButton *objects.PanelButton
-	actionsPanel *objects.Panel
+	actionButton *archetypes.PanelButton
+	actionsPanel *archetypes.Panel
 
-	highlightedTile   objects.Object
+	highlightedTile   archetypes.Object
 	tileSelectionMode bool
 }
 
@@ -76,7 +76,7 @@ func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSy
 func (u *UnitControlSystem) Start() {
 	u.buildMode = false
 
-	u.buildIcon = atlas.Hammer
+	u.buildIcon = sprites.Hammer
 	u.buildIcon.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
 	u.highlightedTile = tiles.NewHighlightTile(u.Config.TileMap.TileWidth, u.Config.TileMap.TileHeight)
@@ -202,7 +202,7 @@ func (u *UnitControlSystem) showActionButton() {
 		return
 	}
 
-	button := objects.NewPanelButton(components.UIColorBrown, u.buildIcon, func() {
+	button := archetypes.NewPanelButton(components.UIColorBrown, u.buildIcon, func() {
 		u.hideActionButton()
 		u.showActionPanel()
 	})
@@ -226,13 +226,13 @@ func (u *UnitControlSystem) showActionPanel() {
 	entity := u.activeEntities.All()[0].(unitControlEntity)
 	options := entity.GetBuilder().Options
 
-	var configs []objects.ButtonConfig
+	var configs []archetypes.ButtonConfig
 	for i := range options {
 		o := options[i]
-		sprite := objects.SpriteForBuilding(o.BuildingType)
+		sprite := archetypes.SpriteForBuilding(o.BuildingType)
 		sprite.Scale(engine.Vector{X: 0.5, Y: 0.5})
 
-		configs = append(configs, objects.ButtonConfig{
+		configs = append(configs, archetypes.ButtonConfig{
 			Sprite: sprite,
 			Action: func() {
 				u.buildMode = true
@@ -242,7 +242,7 @@ func (u *UnitControlSystem) showActionPanel() {
 		})
 	}
 
-	panel := objects.NewFourButtonPanel(configs)
+	panel := archetypes.NewFourButtonPanel(configs)
 	u.Spawner.Spawn(panel)
 
 	entity.GetWorldSpace().AddChild(panel)
@@ -277,7 +277,7 @@ func (u *UnitControlSystem) attemptBuildOnCollision(entity engine.Entity, other 
 		Y: float64(u.Config.TileMap.TileHeight),
 	}
 
-	building := objects.NewBuilding(buildingPos, queued.Option.BuildingType)
+	building := archetypes.NewBuilding(buildingPos, queued.Option.BuildingType)
 	queued.DestinationTile.GetWorldSpace().AddChild(building)
 	u.Spawner.Spawn(building)
 

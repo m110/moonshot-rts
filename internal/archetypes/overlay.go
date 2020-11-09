@@ -1,4 +1,4 @@
-package objects
+package archetypes
 
 import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"

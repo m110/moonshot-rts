@@ -1,13 +1,13 @@
 package tiles
 
 import (
+	"github.com/m110/moonshot-rts/internal/archetypes"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
 	"golang.org/x/image/colornames"
 )
 
-func NewDebugTile(width int, height int) objects.Object {
+func NewDebugTile(width int, height int) archetypes.Object {
 	c := colornames.Pink
 	c.A = 120
 	debugSprite := engine.NewFilledSprite(width-2, height-2, c)
@@ -20,7 +20,7 @@ func NewDebugTile(width int, height int) objects.Object {
 	sprite.DrawAtPosition(debugSprite, 1, 1)
 	sprite.DrawAtPosition(debugPointSprite, width/2, height/2)
 
-	return objects.Object{
+	return archetypes.Object{
 		BaseEntity: engine.NewBaseEntity(),
 		WorldSpace: &components.WorldSpace{},
 		Drawable: &components.Drawable{

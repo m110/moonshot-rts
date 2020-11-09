@@ -1,9 +1,9 @@
-package atlas
+package sprites
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/m110/moonshot-rts/internal/fonts"
+	"github.com/m110/moonshot-rts/internal/assets/fonts"
 	"golang.org/x/image/colornames"
 )
 

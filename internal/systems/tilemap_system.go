@@ -5,12 +5,11 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/archetypes"
+	"github.com/m110/moonshot-rts/internal/archetypes/tiles"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
-	"github.com/m110/moonshot-rts/internal/tiles"
-	"github.com/m110/moonshot-rts/internal/units"
 	"golang.org/x/image/colornames"
 )
 
@@ -36,10 +35,10 @@ func (t TilemapConfig) TotalHeight() int {
 type TilemapSystem struct {
 	BaseSystem
 
-	world objects.Object
+	world archetypes.Object
 
 	tiles      []tiles.Tile
-	debugTiles []objects.Object
+	debugTiles []archetypes.Object
 
 	castlePosition engine.Point
 }
@@ -57,7 +56,7 @@ func (t *TilemapSystem) Start() {
 		colornames.White,
 	)
 
-	t.world = objects.NewObject(worldSprite, components.LayerBackground)
+	t.world = archetypes.NewObject(worldSprite, components.LayerBackground)
 	t.world.GetWorldSpace().Translate(
 		float64(t.Config.TileMap.OffsetX),
 		float64(t.Config.TileMap.OffsetY),
@@ -118,7 +117,7 @@ func (t *TilemapSystem) spawnTiles() {
 					forestType := tiles.ForestType(rand.Intn(3))
 					tile = tiles.NewForestTile(ground, forestType)
 				} else if rand.Intn(10) < mountainChance {
-					mountainsType := objects.MountainType(rand.Intn(3))
+					mountainsType := archetypes.MountainType(rand.Intn(3))
 					tile = tiles.NewMountainsTile(ground, mountainsType)
 				} else {
 					tile = tiles.NewGroundTile(ground)
@@ -160,7 +159,7 @@ func (t TilemapSystem) spawnUnits() {
 
 	spriteGetter := atlasSpriteGetter{}
 
-	king := units.NewUnit(components.TeamBlue, components.ClassKing, spriteGetter)
+	king := archetypes.NewUnit(components.TeamBlue, components.ClassKing, spriteGetter)
 	t.world.GetWorldSpace().AddChild(king)
 	king.GetWorldSpace().Translate(unitsX(0), unitsY(1))
 	t.Spawner.Spawn(king)
@@ -191,5 +190,5 @@ func (t TilemapSystem) Remove(e engine.Entity) {}
 type atlasSpriteGetter struct{}
 
 func (a atlasSpriteGetter) SpriteForUnit(team components.Team, class components.Class) engine.Sprite {
-	return atlas.Units[team][class].Random()
+	return sprites.Units[team][class].Random()
 }

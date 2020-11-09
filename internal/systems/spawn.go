@@ -2,12 +2,11 @@ package systems
 
 import (
 	"fmt"
+	"github.com/m110/moonshot-rts/internal/archetypes"
 
+	"github.com/m110/moonshot-rts/internal/archetypes/tiles"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"github.com/m110/moonshot-rts/internal/objects"
-	"github.com/m110/moonshot-rts/internal/tiles"
-	"github.com/m110/moonshot-rts/internal/units"
 )
 
 type Spawner struct {
@@ -24,15 +23,15 @@ func (s Spawner) Spawn(e engine.Entity) {
 	switch entity := e.(type) {
 	case tiles.Tile:
 		s.spawnTile(entity)
-	case objects.Building:
+	case archetypes.Building:
 		s.spawnBuilding(entity)
-	case units.Unit:
+	case archetypes.Unit:
 		s.spawnUnit(entity)
-	case objects.Panel:
+	case archetypes.Panel:
 		s.spawnPanel(entity)
-	case objects.PanelButton:
+	case archetypes.PanelButton:
 		s.spawnPanelButton(entity)
-	case objects.ProgressBar:
+	case archetypes.ProgressBar:
 		s.spawnProgressBar(entity)
 	default:
 		// Fallback to drawing system for the simplest entities
@@ -53,11 +52,11 @@ func (s Spawner) Spawn(e engine.Entity) {
 
 func (s Spawner) Destroy(e engine.Entity) {
 	switch entity := e.(type) {
-	case objects.Panel:
+	case archetypes.Panel:
 		s.destroyPanel(entity)
-	case objects.PanelButton:
+	case archetypes.PanelButton:
 		s.destroyPanelButton(entity)
-	case objects.ProgressBar:
+	case archetypes.ProgressBar:
 		s.destroyProgressBar(entity)
 	default:
 		panic(fmt.Sprintf("No suitable function found to destroy entity %#v", entity))
@@ -82,7 +81,7 @@ func (s Spawner) spawnTile(tile tiles.Tile) {
 	}
 }
 
-func (s Spawner) spawnBuilding(building objects.Building) {
+func (s Spawner) spawnBuilding(building archetypes.Building) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -101,7 +100,7 @@ func (s Spawner) spawnBuilding(building objects.Building) {
 	}
 }
 
-func (s Spawner) spawnUnit(unit units.Unit) {
+func (s Spawner) spawnUnit(unit archetypes.Unit) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -120,7 +119,7 @@ func (s Spawner) spawnUnit(unit units.Unit) {
 	}
 }
 
-func (s Spawner) spawnPanel(panel objects.Panel) {
+func (s Spawner) spawnPanel(panel archetypes.Panel) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -131,7 +130,7 @@ func (s Spawner) spawnPanel(panel objects.Panel) {
 	}
 }
 
-func (s Spawner) destroyPanel(panel objects.Panel) {
+func (s Spawner) destroyPanel(panel archetypes.Panel) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -142,7 +141,7 @@ func (s Spawner) destroyPanel(panel objects.Panel) {
 	}
 }
 
-func (s Spawner) spawnPanelButton(button objects.PanelButton) {
+func (s Spawner) spawnPanelButton(button archetypes.PanelButton) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -155,7 +154,7 @@ func (s Spawner) spawnPanelButton(button objects.PanelButton) {
 	}
 }
 
-func (s Spawner) destroyPanelButton(button objects.PanelButton) {
+func (s Spawner) destroyPanelButton(button archetypes.PanelButton) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -168,7 +167,7 @@ func (s Spawner) destroyPanelButton(button objects.PanelButton) {
 	}
 }
 
-func (s Spawner) spawnProgressBar(progressBar objects.ProgressBar) {
+func (s Spawner) spawnProgressBar(progressBar archetypes.ProgressBar) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:
@@ -179,7 +178,7 @@ func (s Spawner) spawnProgressBar(progressBar objects.ProgressBar) {
 	}
 }
 
-func (s Spawner) destroyProgressBar(progressBar objects.ProgressBar) {
+func (s Spawner) destroyProgressBar(progressBar archetypes.ProgressBar) {
 	for _, sys := range s.systemsProvider.Systems() {
 		switch system := sys.(type) {
 		case *DrawingSystem:

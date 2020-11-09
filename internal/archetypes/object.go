@@ -1,4 +1,4 @@
-package objects
+package archetypes
 
 import (
 	"github.com/m110/moonshot-rts/internal/components"

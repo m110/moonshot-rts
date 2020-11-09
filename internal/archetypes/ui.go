@@ -1,7 +1,7 @@
-package objects
+package archetypes
 
 import (
-	"github.com/m110/moonshot-rts/internal/atlas"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -20,7 +20,7 @@ type ButtonConfig struct {
 
 func NewFourButtonPanel(buttonConfigs []ButtonConfig) Panel {
 	p := Panel{
-		Object: NewObject(atlas.PanelBrown, components.LayerUIPanel),
+		Object: NewObject(sprites.PanelBrown, components.LayerUIPanel),
 	}
 
 	p.Drawable.Sprite.Scale(engine.Vector{X: 1.5, Y: 1.5})
@@ -59,11 +59,11 @@ func NewPanelButton(color components.UIColor, spriteTop engine.Sprite, action fu
 	var spriteReleased, spritePressed engine.Sprite
 	switch color {
 	case components.UIColorBeige:
-		spriteReleased = atlas.ButtonBeige
-		spritePressed = atlas.ButtonBeigePressed
+		spriteReleased = sprites.ButtonBeige
+		spritePressed = sprites.ButtonBeigePressed
 	case components.UIColorBrown:
-		spriteReleased = atlas.ButtonBrown
-		spritePressed = atlas.ButtonBrownPressed
+		spriteReleased = sprites.ButtonBrown
+		spritePressed = sprites.ButtonBrownPressed
 	}
 
 	b := PanelButton{
@@ -94,14 +94,14 @@ func NewHorizontalProgressBar() ProgressBar {
 		Object: NewObject(engine.NewBlankSprite(1, 1), components.LayerForeground),
 		ProgressBar: &components.ProgressBar{
 			Background: components.ProgressBarSprites{
-				Left:  atlas.BarBackHorizontalLeft,
-				Mid:   atlas.BarBackHorizontalMid,
-				Right: atlas.BarBackHorizontalRight,
+				Left:  sprites.BarBackHorizontalLeft,
+				Mid:   sprites.BarBackHorizontalMid,
+				Right: sprites.BarBackHorizontalRight,
 			},
 			Foreground: components.ProgressBarSprites{
-				Left:  atlas.BarGreenHorizontalLeft,
-				Mid:   atlas.BarGreenHorizontalMid,
-				Right: atlas.BarGreenHorizontalRight,
+				Left:  sprites.BarGreenHorizontalLeft,
+				Mid:   sprites.BarGreenHorizontalMid,
+				Right: sprites.BarGreenHorizontalRight,
 			},
 		},
 	}

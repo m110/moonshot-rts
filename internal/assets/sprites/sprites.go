@@ -1,4 +1,4 @@
-package atlas
+package sprites
 
 import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/m110/moonshot-rts/internal/atlas"
-	"github.com/m110/moonshot-rts/internal/fonts"
+	"github.com/m110/moonshot-rts/internal/assets/fonts"
+	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/game"
 	"github.com/m110/moonshot-rts/internal/systems"
 )
@@ -19,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	err = atlas.LoadSprites("assets/spritesheet.xml", "assets/ui.xml")
+	err = sprites.LoadSprites("assets/spritesheet.xml", "assets/ui.xml")
 	if err != nil {
 		panic(err)
 	}
