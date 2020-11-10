@@ -12,6 +12,12 @@ type buildingControlEntity interface {
 	components.TimeActionsOwner
 }
 
+type spawnedEntity interface {
+	engine.Entity
+	components.ClickableOwner
+	components.MovableOwner
+}
+
 type BuildingControlSystem struct {
 	BaseSystem
 
@@ -21,7 +27,7 @@ type BuildingControlSystem struct {
 
 	buildPanel *archetypes.Panel
 
-	spawnedUnits []archetypes.Unit
+	spawnedEntities []spawnedEntity
 }
 
 func NewBuildingControlSystem(base BaseSystem) *BuildingControlSystem {
@@ -37,13 +43,13 @@ func (b *BuildingControlSystem) Start() {
 
 func (b *BuildingControlSystem) Update(dt float64) {
 	// TODO Rework this (with events?)
-	units := b.spawnedUnits
-	b.spawnedUnits = nil
-	for _, u := range units {
-		if u.Target == nil {
-			u.Clickable.Enable()
+	spawned := b.spawnedEntities
+	b.spawnedEntities = nil
+	for _, u := range spawned {
+		if u.GetMovable().Target == nil {
+			u.GetClickable().Enable()
 		} else {
-			b.spawnedUnits = append(b.spawnedUnits, u)
+			b.spawnedEntities = append(b.spawnedEntities, u)
 		}
 	}
 
@@ -172,20 +178,34 @@ func (b *BuildingControlSystem) showProgressBar(entity buildingControlEntity) {
 }
 
 func (b *BuildingControlSystem) spawnUnit(spawnPosition engine.Vector, team components.Team, class components.Class) {
-	unit := archetypes.NewUnit(team, class, atlasSpriteGetter{})
-	b.Spawner.Spawn(unit)
-
-	unit.GetWorldSpace().SetInWorld(spawnPosition.X, spawnPosition.Y)
-
 	// TODO This should be based on tiles, not absolute position
 	target := spawnPosition
 	target.Translate(
 		float64(engine.RandomRange(-32, 32)),
 		float64(engine.RandomRange(12, 32)),
 	)
-	unit.Clickable.Disable()
-	unit.GetMovable().SetTarget(target)
-	b.spawnedUnits = append(b.spawnedUnits, unit)
+
+	// TODO This is a terrible duplication :(
+	switch class {
+	case components.ClassWorker:
+		worker := archetypes.NewWorker(team, atlasSpriteGetter{})
+		b.Spawner.Spawn(worker)
+
+		worker.GetWorldSpace().SetInWorld(spawnPosition.X, spawnPosition.Y)
+		worker.Clickable.Disable()
+
+		worker.GetMovable().SetTarget(target)
+		b.spawnedEntities = append(b.spawnedEntities, worker)
+	default:
+		unit := archetypes.NewUnit(team, class, atlasSpriteGetter{})
+		b.Spawner.Spawn(unit)
+
+		unit.GetWorldSpace().SetInWorld(spawnPosition.X, spawnPosition.Y)
+		unit.Clickable.Disable()
+
+		unit.GetMovable().SetTarget(target)
+		b.spawnedEntities = append(b.spawnedEntities, unit)
+	}
 }
 
 func (b *BuildingControlSystem) Add(entity buildingControlEntity) {

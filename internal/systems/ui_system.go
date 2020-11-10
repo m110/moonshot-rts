@@ -2,10 +2,10 @@ package systems
 
 import (
 	"fmt"
-	"github.com/m110/moonshot-rts/internal/archetypes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/m110/moonshot-rts/internal/archetypes"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 	"golang.org/x/image/colornames"
@@ -91,5 +91,4 @@ func (u UISystem) Update(_ float64) {
 	)
 }
 
-func (u UISystem) Remove(entity engine.Entity) {
-}
+func (u UISystem) Remove(entity engine.Entity) {}

@@ -2,6 +2,7 @@ package systems
 
 import (
 	"fmt"
+
 	"github.com/m110/moonshot-rts/internal/archetypes"
 
 	"github.com/m110/moonshot-rts/internal/archetypes/tiles"
@@ -27,6 +28,8 @@ func (s Spawner) Spawn(e engine.Entity) {
 		s.spawnBuilding(entity)
 	case archetypes.Unit:
 		s.spawnUnit(entity)
+	case archetypes.Worker:
+		s.spawnWorker(entity)
 	case archetypes.Panel:
 		s.spawnPanel(entity)
 	case archetypes.PanelButton:
@@ -111,10 +114,27 @@ func (s Spawner) spawnUnit(unit archetypes.Unit) {
 			system.Add(unit)
 		case *ClickingSystem:
 			system.Add(unit)
-		case *TimeActionsSystem:
-			system.Add(unit)
 		case *CollisionSystem:
 			system.Add(unit)
+		}
+	}
+}
+
+func (s Spawner) spawnWorker(worker archetypes.Worker) {
+	for _, sys := range s.systemsProvider.Systems() {
+		switch system := sys.(type) {
+		case *DrawingSystem:
+			system.Add(worker)
+		case *SelectionSystem:
+			system.Add(worker)
+		case *UnitControlSystem:
+			system.Add(worker)
+		case *ClickingSystem:
+			system.Add(worker)
+		case *CollisionSystem:
+			system.Add(worker)
+		case *ResourcesSystem:
+			system.Add(worker)
 		}
 	}
 }

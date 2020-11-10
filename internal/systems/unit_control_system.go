@@ -15,8 +15,6 @@ type unitControlEntity interface {
 	engine.Entity
 	components.WorldSpaceOwner
 	components.MovableOwner
-	components.BuilderOwner
-	components.TimeActionsOwner
 	components.ColliderOwner
 }
 
@@ -167,7 +165,11 @@ func (u *UnitControlSystem) moveEntities(dt float64) {
 	for _, e := range u.entities.All() {
 		entity := e.(unitControlEntity)
 		movable := entity.GetMovable()
-		if movable.Disabled || movable.Target != nil {
+		if movable.Disabled {
+			continue
+		}
+
+		if movable.Target != nil {
 			if entity.GetWorldSpace().WorldPosition().Distance(*movable.Target) < 1.0 {
 				u.EventBus.Publish(EntityReachedTarget{Entity: entity})
 				movable.ClearTarget()
@@ -198,9 +200,14 @@ func (u *UnitControlSystem) updateHighlightedTile() {
 
 func (u *UnitControlSystem) showActionButton() {
 	entity := u.activeEntities.All()[0].(unitControlEntity)
-	if len(entity.GetBuilder().Options) == 0 {
-		return
+	_, ok := entity.(components.BuilderOwner)
+	if ok {
+		u.showBuildButton(entity)
 	}
+}
+
+func (u *UnitControlSystem) showBuildButton(e engine.Entity) {
+	entity := e.(unitControlEntity)
 
 	button := archetypes.NewPanelButton(components.UIColorBrown, u.buildIcon, func() {
 		u.hideActionButton()
@@ -224,7 +231,16 @@ func (u *UnitControlSystem) hideActionButton() {
 
 func (u *UnitControlSystem) showActionPanel() {
 	entity := u.activeEntities.All()[0].(unitControlEntity)
-	options := entity.GetBuilder().Options
+	_, ok := entity.(components.BuilderOwner)
+	if ok {
+		u.showBuildPanel(entity)
+	}
+}
+
+func (u *UnitControlSystem) showBuildPanel(e engine.Entity) {
+	entity := e.(unitControlEntity)
+
+	options := entity.(components.BuilderOwner).GetBuilder().Options
 
 	var configs []archetypes.ButtonConfig
 	for i := range options {

@@ -28,6 +28,14 @@ type ProgressBarOwner interface {
 	GetProgressBar() *ProgressBar
 }
 
+type ResourcesSourceOwner interface {
+	GetResourcesSource() *ResourcesSource
+}
+
+type ResourcesCollectorOwner interface {
+	GetResourcesCollector() *ResourcesCollector
+}
+
 type SelectableOwner interface {
 	GetSelectable() *Selectable
 }

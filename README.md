@@ -34,6 +34,16 @@ The TL;DR version of ECS is:
 For example, there's `DrawingSystem` that draws sprites on the screen.
 It requires an entity with `Drawable` (a sprite) and `WorldSpace` (a position) components.
 
+## Project structure
+
+* `internal/`
+    * `archetypes`
+    * `assets`
+    * `components`
+    * `engine`
+    * `game`
+    * `systems`
+
 ## Game
 
 * Right now, my idea is a mix between Age of Empires style RTS, and Civilzation resource tiles

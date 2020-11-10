@@ -42,6 +42,7 @@ func NewGroundTile(groundType GroundType) Tile {
 			Bounds: components.BoundsFromSprite(sprite),
 			Layer:  components.CollisionLayerGround,
 		},
+		ResourcesSource: &components.ResourcesSource{},
 	}
 }
 
@@ -58,7 +59,7 @@ func NewForestTile(groundType GroundType, forestType ForestType) Tile {
 
 	treesCount := engine.RandomRange(2, 5)
 	y := engine.RandomRange(5, 15)
-	for i := 0; i <= treesCount; i++ {
+	for i := 0; i < treesCount; i++ {
 		y += engine.RandomRange(5, 10)
 
 		tree := archetypes.NewTree(forestToTripType(forestType))
@@ -68,6 +69,8 @@ func NewForestTile(groundType GroundType, forestType ForestType) Tile {
 			float64(y),
 		)
 	}
+
+	t.ResourcesSource.Resources.Wood = treesCount
 
 	return t
 }
@@ -104,6 +107,15 @@ func NewMountainsTile(groundType GroundType, mountainType archetypes.MountainTyp
 		float64(engine.RandomRange(heightOffset, height-heightOffset)),
 	)
 	t.GetWorldSpace().AddChild(mountain)
+
+	switch mountainType {
+	case archetypes.MountainStone:
+		t.ResourcesSource.Resources.Stone = 1
+	case archetypes.MountainIron:
+		t.ResourcesSource.Resources.Iron = 1
+	case archetypes.MountainGold:
+		t.ResourcesSource.Resources.Gold = 1
+	}
 
 	return t
 }

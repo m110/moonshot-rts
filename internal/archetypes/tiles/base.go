@@ -11,4 +11,5 @@ type Tile struct {
 	*components.Drawable
 	*components.Clickable
 	*components.Collider
+	*components.ResourcesSource
 }

@@ -86,10 +86,10 @@ func (u Unit) GetCollider() *components.Collider {
 	return u.Collider
 }
 
-func (u Unit) GetBuilder() *components.Builder {
-	return u.Builder
+func (w Worker) GetBuilder() *components.Builder {
+	return w.Builder
 }
 
-func (u Unit) GetTimeActions() *components.TimeActions {
-	return u.TimeActions
+func (w Worker) GetResourcesCollector() *components.ResourcesCollector {
+	return w.ResourcesCollector
 }

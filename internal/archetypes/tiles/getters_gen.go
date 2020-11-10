@@ -17,3 +17,7 @@ func (t Tile) GetClickable() *components.Clickable {
 func (t Tile) GetCollider() *components.Collider {
 	return t.Collider
 }
+
+func (t Tile) GetResourcesSource() *components.ResourcesSource {
+	return t.ResourcesSource
+}

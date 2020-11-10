@@ -16,8 +16,12 @@ type Unit struct {
 	*components.Selectable
 	*components.Clickable
 	*components.Collider
+}
+
+type Worker struct {
+	Unit
 	*components.Builder
-	*components.TimeActions
+	*components.ResourcesCollector
 }
 
 type spriteGetter interface {
@@ -28,29 +32,6 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 	sprite := spriteGetter.SpriteForUnit(team, class)
 	w, h := sprite.Size()
 	overlay := NewOverlay(w+20, h+20, engine.PivotBottom)
-
-	var options []components.BuilderOption
-	switch class {
-	case components.ClassWorker:
-		options = []components.BuilderOption{
-			{
-				BuildingType: components.BuildingBarracks,
-				SpawnTime:    time.Second * 10,
-			},
-			{
-				BuildingType: components.BuildingForge,
-				SpawnTime:    time.Second * 5,
-			},
-			{
-				BuildingType: components.BuildingChapel,
-				SpawnTime:    time.Second * 15,
-			},
-			{
-				BuildingType: components.BuildingTower,
-				SpawnTime:    time.Second * 20,
-			},
-		}
-	}
 
 	u := Unit{
 		engine.NewBaseEntity(),
@@ -75,14 +56,41 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 			Bounds: components.BoundsFromSprite(sprite),
 			Layer:  components.CollisionLayerUnits,
 		},
-		&components.Builder{
-			Options: options,
-		},
-		&components.TimeActions{},
 	}
 
 	u.GetWorldSpace().AddChild(overlay)
 	overlay.GetWorldSpace().Translate(0, 10)
 
 	return u
+}
+
+func NewWorker(team components.Team, spriteGetter spriteGetter) Worker {
+	unit := NewUnit(team, components.ClassWorker, spriteGetter)
+
+	options := []components.BuilderOption{
+		{
+			BuildingType: components.BuildingBarracks,
+			SpawnTime:    time.Second * 10,
+		},
+		{
+			BuildingType: components.BuildingForge,
+			SpawnTime:    time.Second * 5,
+		},
+		{
+			BuildingType: components.BuildingChapel,
+			SpawnTime:    time.Second * 15,
+		},
+		{
+			BuildingType: components.BuildingTower,
+			SpawnTime:    time.Second * 20,
+		},
+	}
+
+	return Worker{
+		Unit: unit,
+		Builder: &components.Builder{
+			Options: options,
+		},
+		ResourcesCollector: &components.ResourcesCollector{},
+	}
 }

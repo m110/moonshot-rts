@@ -48,6 +48,7 @@ var allArchetypes = []interface{}{
 	archetypes.ProgressBar{},
 	tiles.Tile{},
 	archetypes.Unit{},
+	archetypes.Worker{},
 }
 
 var allComponents = []interface{}{
@@ -58,6 +59,8 @@ var allComponents = []interface{}{
 	components.Drawable{},
 	components.Movable{},
 	components.ProgressBar{},
+	components.ResourcesSource{},
+	components.ResourcesCollector{},
 	components.Selectable{},
 	components.Size{},
 	components.TimeActions{},
