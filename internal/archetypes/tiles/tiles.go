@@ -43,6 +43,7 @@ func NewGroundTile(groundType GroundType) Tile {
 			Layer:  components.CollisionLayerGround,
 		},
 		ResourcesSource: &components.ResourcesSource{},
+		Area:            &components.Area{},
 	}
 }
 

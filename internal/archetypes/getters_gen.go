@@ -86,6 +86,10 @@ func (u Unit) GetCollider() *components.Collider {
 	return u.Collider
 }
 
+func (u Unit) GetAreaOccupant() *components.AreaOccupant {
+	return u.AreaOccupant
+}
+
 func (w Worker) GetBuilder() *components.Builder {
 	return w.Builder
 }

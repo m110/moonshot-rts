@@ -1,12 +1,14 @@
 package systems
 
 import (
+	"github.com/m110/moonshot-rts/internal/archetypes"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
 
 type resourcesEntity interface {
 	engine.Entity
+	components.AreaOccupantOwner
 	components.ColliderOwner
 	components.MovableOwner
 	components.ResourcesCollectorOwner
@@ -21,54 +23,53 @@ type ResourcesSystem struct {
 
 	entities  EntityMap
 	resources components.Resources
+
+	tileOverlays map[resourcesEntity]archetypes.Object
 }
 
 func NewResourcesSystem(base BaseSystem) *ResourcesSystem {
-	return &ResourcesSystem{
-		BaseSystem: base,
+	r := &ResourcesSystem{
+		BaseSystem:   base,
+		tileOverlays: map[resourcesEntity]archetypes.Object{},
 	}
+
+	r.EventBus.Subscribe(EntityOccupiedArea{}, r)
+	r.EventBus.Subscribe(EntityStoppedOccupyingArea{}, r)
+
+	return r
 }
 
 func (r *ResourcesSystem) Start() {
-	r.EventBus.Subscribe(EntityMoved{}, r)
-	r.EventBus.Subscribe(EntityReachedTarget{}, r)
-	r.EventBus.Subscribe(EntitiesCollided{}, r)
 	r.updateResources()
 }
 
 func (r *ResourcesSystem) HandleEvent(e engine.Event) {
 	switch event := e.(type) {
-	case EntityMoved:
+	case EntityOccupiedArea:
 		ent, ok := r.entities.ByID(event.Entity.ID())
 		if !ok {
 			return
 		}
+
+		tile, ok := event.Area.(components.ResourcesSourceOwner)
+		if !ok {
+			return
+		}
+
+		entity := ent.(resourcesEntity)
+
+		entity.GetResourcesCollector().CurrentResources = tile.GetResourcesSource().Resources
+		entity.GetResourcesCollector().Collecting = true
+		r.updateResources()
+	case EntityStoppedOccupyingArea:
+		ent, ok := r.entities.ByID(event.Entity.ID())
+		if !ok {
+			return
+		}
+
 		entity := ent.(resourcesEntity)
 		entity.GetResourcesCollector().Collecting = false
 		r.updateResources()
-
-	case EntityReachedTarget:
-		ent, ok := r.entities.ByID(event.Entity.ID())
-		if !ok {
-			return
-		}
-		entity := ent.(resourcesEntity)
-		entity.GetResourcesCollector().Collecting = true
-		r.updateResources()
-
-	case EntitiesCollided:
-		ent, ok := r.entities.ByID(event.Entity.ID())
-		if !ok {
-			return
-		}
-		entity := ent.(resourcesEntity)
-
-		source, ok := event.Other.(components.ResourcesSourceOwner)
-		if !ok {
-			return
-		}
-
-		entity.GetResourcesCollector().CurrentResources = source.GetResourcesSource().Resources
 	}
 }
 
@@ -88,6 +89,17 @@ func (r ResourcesSystem) Update(dt float64) {}
 
 func (r *ResourcesSystem) Add(entity resourcesEntity) {
 	r.entities.Add(entity)
+
+	/*
+		overlay := archetypes.NewOverlay(
+			r.Config.TileMap.TileWidth,
+			r.Config.TileMap.TileHeight,
+			engine.PivotBottom,
+		)
+
+		entity.GetWorldSpace().AddChild(overlay)
+		r.Spawner.Spawn(overlay)
+	*/
 }
 
 func (r *ResourcesSystem) Remove(entity engine.Entity) {

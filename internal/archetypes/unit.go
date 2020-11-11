@@ -16,6 +16,7 @@ type Unit struct {
 	*components.Selectable
 	*components.Clickable
 	*components.Collider
+	*components.AreaOccupant
 }
 
 type Worker struct {
@@ -33,6 +34,8 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 	w, h := sprite.Size()
 	overlay := NewOverlay(w+20, h+20, engine.PivotBottom)
 
+	spriteBounds := components.BoundsFromSprite(sprite)
+
 	u := Unit{
 		engine.NewBaseEntity(),
 		&components.WorldSpace{},
@@ -49,13 +52,21 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 			Overlay: overlay,
 		},
 		&components.Clickable{
-			Bounds:    components.BoundsFromSprite(sprite),
+			Bounds:    spriteBounds,
 			ByOverlay: true,
 		},
 		&components.Collider{
-			Bounds: components.BoundsFromSprite(sprite),
-			Layer:  components.CollisionLayerUnits,
+			Bounds: engine.Rect{
+				Position: engine.Vector{
+					X: spriteBounds.Width / 2,
+					Y: spriteBounds.Height - 10,
+				},
+				Width:  10,
+				Height: 10,
+			},
+			Layer: components.CollisionLayerUnits,
 		},
+		&components.AreaOccupant{},
 	}
 
 	u.GetWorldSpace().AddChild(overlay)

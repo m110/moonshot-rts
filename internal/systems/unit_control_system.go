@@ -15,7 +15,7 @@ type unitControlEntity interface {
 	engine.Entity
 	components.WorldSpaceOwner
 	components.MovableOwner
-	components.ColliderOwner
+	components.AreaOccupantOwner
 }
 
 type tileFinder interface {
@@ -65,8 +65,7 @@ func NewUnitControlSystem(base BaseSystem, tileFinder tileFinder) *UnitControlSy
 	u.EventBus.Subscribe(PointClicked{}, u)
 	u.EventBus.Subscribe(EntitySelected{}, u)
 	u.EventBus.Subscribe(EntityUnselected{}, u)
-	u.EventBus.Subscribe(EntitiesCollided{}, u)
-	u.EventBus.Subscribe(EntitiesOutOfCollision{}, u)
+	u.EventBus.Subscribe(EntityOccupiedArea{}, u)
 
 	return u
 }
@@ -136,28 +135,21 @@ func (u *UnitControlSystem) HandleEvent(e engine.Event) {
 					Option:          u.buildingToBuild,
 				}
 
-				if entity.GetCollider().HasCollision(tile) {
-					u.attemptBuildOnCollision(entity, tile)
+				if entity.GetAreaOccupant().OccupiedArea.Equals(tile) {
+					u.attemptBuildOnOccupy(entity, tile)
 					return
 				}
 			}
 
 			entity.GetMovable().SetTarget(event.Point)
 		}
-	case EntitiesCollided:
+	case EntityOccupiedArea:
 		entity, ok := u.entities.ByID(event.Entity.ID())
 		if !ok {
 			return
 		}
 
-		u.attemptBuildOnCollision(entity, event.Other)
-		fmt.Println(entity, "collides with", event.Other)
-	case EntitiesOutOfCollision:
-		entity, ok := u.entities.ByID(event.Entity.ID())
-		if !ok {
-			return
-		}
-		fmt.Println(entity, "out of collision with", event.Other)
+		u.attemptBuildOnOccupy(entity, event.Area)
 	}
 }
 
@@ -275,7 +267,7 @@ func (u *UnitControlSystem) hideActionsPanel() {
 	u.actionsPanel = nil
 }
 
-func (u *UnitControlSystem) attemptBuildOnCollision(entity engine.Entity, other engine.Entity) {
+func (u *UnitControlSystem) attemptBuildOnOccupy(entity engine.Entity, other engine.Entity) {
 	queued, ok := u.buildingsQueued[entity.ID()]
 	if !ok {
 		return

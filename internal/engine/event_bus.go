@@ -20,6 +20,7 @@ type EventBus struct {
 func NewEventBus() *EventBus {
 	return &EventBus{
 		subscribers: map[Event][]Subscriber{},
+		debug:       true,
 	}
 }
 

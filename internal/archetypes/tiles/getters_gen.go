@@ -21,3 +21,7 @@ func (t Tile) GetCollider() *components.Collider {
 func (t Tile) GetResourcesSource() *components.ResourcesSource {
 	return t.ResourcesSource
 }
+
+func (t Tile) GetArea() *components.Area {
+	return t.Area
+}

@@ -1,5 +1,13 @@
 package components
 
+type AreaOwner interface {
+	GetArea() *Area
+}
+
+type AreaOccupantOwner interface {
+	GetAreaOccupant() *AreaOccupant
+}
+
 type BuilderOwner interface {
 	GetBuilder() *Builder
 }

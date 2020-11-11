@@ -49,6 +49,7 @@ func (g *Game) Start() {
 		systems.NewTimeActionsSystem(baseSystem),
 		systems.NewProgressBarSystem(baseSystem),
 		systems.NewCollisionSystem(baseSystem),
+		systems.NewAreaOccupySystem(baseSystem),
 	}
 
 	for _, s := range g.systems {

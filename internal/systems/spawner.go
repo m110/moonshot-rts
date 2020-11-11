@@ -116,6 +116,8 @@ func (s Spawner) spawnUnit(unit archetypes.Unit) {
 			system.Add(unit)
 		case *CollisionSystem:
 			system.Add(unit)
+		case *AreaOccupySystem:
+			system.Add(unit)
 		}
 	}
 }
@@ -132,6 +134,8 @@ func (s Spawner) spawnWorker(worker archetypes.Worker) {
 		case *ClickingSystem:
 			system.Add(worker)
 		case *CollisionSystem:
+			system.Add(worker)
+		case *AreaOccupySystem:
 			system.Add(worker)
 		case *ResourcesSystem:
 			system.Add(worker)

@@ -52,6 +52,8 @@ var allArchetypes = []interface{}{
 }
 
 var allComponents = []interface{}{
+	components.Area{},
+	components.AreaOccupant{},
 	components.Builder{},
 	components.Button{},
 	components.Clickable{},
