@@ -11,8 +11,9 @@ const (
 )
 
 type Collider struct {
-	Bounds engine.Rect
-	Layer  CollisionLayer
+	Bounds  engine.Rect
+	Layer   CollisionLayer
+	Overlay DrawableOwner
 
 	collisions map[engine.EntityID]engine.Entity
 }

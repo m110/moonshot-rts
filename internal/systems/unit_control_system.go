@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
+
 	"github.com/m110/moonshot-rts/internal/archetypes"
 	"github.com/m110/moonshot-rts/internal/archetypes/tiles"
 	"github.com/m110/moonshot-rts/internal/assets/sprites"
@@ -293,8 +294,15 @@ func (u *UnitControlSystem) attemptBuildOnOccupy(entity engine.Entity, other eng
 }
 
 func canBuildOnTile(tile tiles.Tile) bool {
-	// TODO ?
-	return len(tile.GetWorldSpace().Children) == 0
+	// TODO Find a better way?
+	for _, c := range tile.GetWorldSpace().Children {
+		_, ok := c.(components.SelectableOwner)
+		if ok {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (u *UnitControlSystem) Add(entity unitControlEntity) {

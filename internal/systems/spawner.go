@@ -80,6 +80,8 @@ func (s Spawner) spawnTile(tile tiles.Tile) {
 			system.Add(tile)
 		case *CollisionSystem:
 			system.Add(tile)
+		case *AreaSystem:
+			system.Add(tile)
 		}
 	}
 }

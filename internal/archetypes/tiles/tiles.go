@@ -3,6 +3,8 @@ package tiles
 import (
 	"math/rand"
 
+	"golang.org/x/image/colornames"
+
 	"github.com/m110/moonshot-rts/internal/archetypes"
 	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
@@ -28,7 +30,10 @@ func NewGroundTile(groundType GroundType) Tile {
 		sprite = sprites.Water1
 	}
 
-	return Tile{
+	width, height := sprite.Size()
+	areaOverlay := archetypes.NewOverlay(width, height, engine.PivotTopLeft, colornames.Lime)
+
+	t := Tile{
 		BaseEntity: engine.NewBaseEntity(),
 		WorldSpace: &components.WorldSpace{},
 		Drawable: &components.Drawable{
@@ -43,8 +48,14 @@ func NewGroundTile(groundType GroundType) Tile {
 			Layer:  components.CollisionLayerGround,
 		},
 		ResourcesSource: &components.ResourcesSource{},
-		Area:            &components.Area{},
+		Area: &components.Area{
+			Overlay: areaOverlay,
+		},
 	}
+
+	t.GetWorldSpace().AddChild(areaOverlay)
+
+	return t
 }
 
 type ForestType int

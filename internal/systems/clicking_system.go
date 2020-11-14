@@ -1,8 +1,10 @@
 package systems
 
 import (
-	"github.com/m110/moonshot-rts/internal/archetypes"
 	"math"
+
+	"github.com/m110/moonshot-rts/internal/archetypes"
+	"golang.org/x/image/colornames"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -50,7 +52,7 @@ func NewClickingSystem(base BaseSystem) *ClickingSystem {
 }
 
 func (c *ClickingSystem) Start() {
-	c.overlay = archetypes.NewOverlay(1, 1, engine.PivotTopLeft)
+	c.overlay = archetypes.NewOverlay(1, 1, engine.PivotTopLeft, colornames.White)
 	c.overlay.GetDrawable().Disable()
 	c.Spawner.Spawn(c.overlay)
 }
@@ -179,7 +181,7 @@ func (c *ClickingSystem) updateOverlay(cursor engine.Vector) {
 		c.overlay.Size.Height = 1
 	}
 
-	c.overlay.Drawable.Sprite = archetypes.NewRectangleSprite(c.overlay, engine.PivotTopLeft)
+	c.overlay.Drawable.Sprite = archetypes.NewRectangleSprite(c.overlay, engine.PivotTopLeft, colornames.White)
 }
 
 func (c *ClickingSystem) hideOverlay() {

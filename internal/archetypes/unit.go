@@ -3,6 +3,8 @@ package archetypes
 import (
 	"time"
 
+	"golang.org/x/image/colornames"
+
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -32,9 +34,17 @@ type spriteGetter interface {
 func NewUnit(team components.Team, class components.Class, spriteGetter spriteGetter) Unit {
 	sprite := spriteGetter.SpriteForUnit(team, class)
 	w, h := sprite.Size()
-	overlay := NewOverlay(w+20, h+20, engine.PivotBottom)
+	overlay := NewOverlay(w+20, h+20, engine.PivotBottom, colornames.White)
 
-	spriteBounds := components.BoundsFromSprite(sprite)
+	colliderBounds := engine.Rect{
+		Position: engine.Vector{
+			X: -5,
+			Y: -5,
+		},
+		Width:  10,
+		Height: 5,
+	}
+	colliderOverlay := NewOverlay(int(colliderBounds.Width), int(colliderBounds.Height), engine.PivotTopLeft, colornames.Red)
 
 	u := Unit{
 		engine.NewBaseEntity(),
@@ -52,25 +62,22 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 			Overlay: overlay,
 		},
 		&components.Clickable{
-			Bounds:    spriteBounds,
+			Bounds:    components.BoundsFromSprite(sprite),
 			ByOverlay: true,
 		},
 		&components.Collider{
-			Bounds: engine.Rect{
-				Position: engine.Vector{
-					X: spriteBounds.Width / 2,
-					Y: spriteBounds.Height - 10,
-				},
-				Width:  10,
-				Height: 10,
-			},
-			Layer: components.CollisionLayerUnits,
+			Bounds:  colliderBounds,
+			Layer:   components.CollisionLayerUnits,
+			Overlay: colliderOverlay,
 		},
 		&components.AreaOccupant{},
 	}
 
 	u.GetWorldSpace().AddChild(overlay)
 	overlay.GetWorldSpace().Translate(0, 10)
+
+	u.GetWorldSpace().AddChild(colliderOverlay)
+	colliderOverlay.GetWorldSpace().Translate(colliderBounds.Position.X, colliderBounds.Position.Y)
 
 	return u
 }

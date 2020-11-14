@@ -51,7 +51,9 @@ func (t *AreaOccupySystem) HandleEvent(e engine.Event) {
 		}
 
 		entity := ent.(areaOccupyEntity)
-		if entity.GetAreaOccupant().OccupiedArea != nil {
+		occupant := entity.GetAreaOccupant()
+		if occupant.Occupying && occupant.OccupiedArea != nil {
+			occupant.Occupying = false
 			t.EventBus.Publish(EntityStoppedOccupyingArea{
 				Entity: entity,
 				Area:   entity.GetAreaOccupant().OccupiedArea,
@@ -67,6 +69,7 @@ func (t *AreaOccupySystem) HandleEvent(e engine.Event) {
 		occupant := entity.GetAreaOccupant()
 
 		if occupant.OccupiedArea != nil {
+			occupant.Occupying = true
 			t.EventBus.Publish(EntityOccupiedArea{
 				Entity: entity,
 				Area:   occupant.OccupiedArea,
@@ -105,6 +108,7 @@ func (t *AreaOccupySystem) HandleEvent(e engine.Event) {
 
 		if occupant.NextArea != nil {
 			occupant.OccupiedArea = occupant.NextArea
+			occupant.NextArea = nil
 		}
 	}
 }
@@ -112,7 +116,7 @@ func (t *AreaOccupySystem) HandleEvent(e engine.Event) {
 func (t AreaOccupySystem) Update(dt float64) {
 }
 
-func (t *AreaOccupySystem) Add(entity engine.Entity) {
+func (t *AreaOccupySystem) Add(entity areaOccupyEntity) {
 	t.entities.Add(entity)
 }
 

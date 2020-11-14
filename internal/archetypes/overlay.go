@@ -1,10 +1,11 @@
 package archetypes
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
-	"golang.org/x/image/colornames"
 )
 
 type Overlay struct {
@@ -14,7 +15,7 @@ type Overlay struct {
 	*components.Size
 }
 
-func NewOverlay(width int, height int, pivotType engine.PivotType) Overlay {
+func NewOverlay(width int, height int, pivotType engine.PivotType, c color.RGBA) Overlay {
 	o := Overlay{
 		BaseEntity: engine.NewBaseEntity(),
 		WorldSpace: &components.WorldSpace{},
@@ -25,7 +26,7 @@ func NewOverlay(width int, height int, pivotType engine.PivotType) Overlay {
 	}
 
 	o.Drawable = &components.Drawable{
-		Sprite:   NewRectangleSprite(o, pivotType),
+		Sprite:   NewRectangleSprite(o, pivotType, c),
 		Layer:    components.LayerUI,
 		Disabled: true,
 	}
@@ -33,11 +34,10 @@ func NewOverlay(width int, height int, pivotType engine.PivotType) Overlay {
 	return o
 }
 
-func NewRectangleSprite(owner components.SizeOwner, pivotType engine.PivotType) engine.Sprite {
+func NewRectangleSprite(owner components.SizeOwner, pivotType engine.PivotType, c color.RGBA) engine.Sprite {
 	width := float64(owner.GetSize().Width)
 	height := float64(owner.GetSize().Height)
 
-	c := colornames.White
 	c.A = 175
 	sprite := engine.NewBlankSprite(int(width), int(height))
 	sprite.SetPivot(engine.NewPivotForSprite(sprite, pivotType))

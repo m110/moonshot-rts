@@ -1,6 +1,8 @@
 package systems
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
 )
@@ -120,6 +122,16 @@ func (c *CollisionSystem) Update(dt float64) {
 				Entity: other,
 				Other:  entity,
 			})
+		}
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		for _, e := range c.entities.All() {
+			entity := e.(collisionEntity)
+			overlay := entity.GetCollider().Overlay
+			if overlay != nil {
+				overlay.GetDrawable().Disabled = !overlay.GetDrawable().Disabled
+			}
 		}
 	}
 

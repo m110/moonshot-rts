@@ -3,6 +3,8 @@ package archetypes
 import (
 	"time"
 
+	"golang.org/x/image/colornames"
+
 	"github.com/m110/moonshot-rts/internal/assets/sprites"
 	"github.com/m110/moonshot-rts/internal/components"
 	"github.com/m110/moonshot-rts/internal/engine"
@@ -53,7 +55,7 @@ func NewBuilding(position engine.Vector, buildingType components.BuildingType) B
 	if !topSprite.IsZero() {
 		h += topSprite.Height()
 	}
-	overlay := NewOverlay(w, h, engine.PivotBottom)
+	overlay := NewOverlay(w, h, engine.PivotBottom, colornames.White)
 
 	b := Building{
 		Object: NewObject(bottomSprite, components.LayerObjects),
