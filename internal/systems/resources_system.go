@@ -6,6 +6,14 @@ import (
 	"github.com/m110/moonshot-rts/internal/engine"
 )
 
+var baseResources = components.Resources{
+	Food:  3,
+	Wood:  2,
+	Stone: 0,
+	Gold:  1,
+	Iron:  0,
+}
+
 type resourcesEntity interface {
 	engine.Entity
 	components.AreaOccupantOwner
@@ -15,14 +23,17 @@ type resourcesEntity interface {
 }
 
 type ResourcesUpdated struct {
-	Resources components.Resources
+	UsedResources      components.Resources
+	AvailableResources components.Resources
 }
 
 type ResourcesSystem struct {
 	BaseSystem
 
-	entities  EntityMap
-	resources components.Resources
+	entities EntityMap
+
+	availableResources components.Resources
+	usedResources      components.Resources
 
 	tileOverlays map[resourcesEntity]archetypes.Object
 }
@@ -74,32 +85,24 @@ func (r *ResourcesSystem) HandleEvent(e engine.Event) {
 }
 
 func (r *ResourcesSystem) updateResources() {
-	r.resources = components.Resources{}
+	r.availableResources = baseResources
 	for _, e := range r.entities.All() {
 		entity := e.(resourcesEntity)
 		if entity.GetResourcesCollector().Collecting {
-			r.resources.Update(entity.GetResourcesCollector().CurrentResources)
+			r.availableResources.Update(entity.GetResourcesCollector().CurrentResources)
 		}
 	}
 
-	r.EventBus.Publish(ResourcesUpdated{Resources: r.resources})
+	r.EventBus.Publish(ResourcesUpdated{
+		UsedResources:      r.usedResources,
+		AvailableResources: r.availableResources,
+	})
 }
 
 func (r ResourcesSystem) Update(dt float64) {}
 
 func (r *ResourcesSystem) Add(entity resourcesEntity) {
 	r.entities.Add(entity)
-
-	/*
-		overlay := archetypes.NewOverlay(
-			r.Config.TileMap.TileWidth,
-			r.Config.TileMap.TileHeight,
-			engine.PivotBottom,
-		)
-
-		entity.GetWorldSpace().AddChild(overlay)
-		r.Spawner.Spawn(overlay)
-	*/
 }
 
 func (r *ResourcesSystem) Remove(entity engine.Entity) {

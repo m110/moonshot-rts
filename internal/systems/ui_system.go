@@ -58,9 +58,14 @@ func (u *UISystem) Start() {
 	u.Spawner.Spawn(ui)
 }
 
-func (u UISystem) updateResources(resources components.Resources) {
-	content := fmt.Sprintf("Food: %v Wood: %v Stone: %v Gold: %v Iron: %v",
-		resources.Food, resources.Wood, resources.Stone, resources.Gold, resources.Iron)
+func (u UISystem) updateResources(used components.Resources, available components.Resources) {
+	content := fmt.Sprintf("Food: %v/%v Wood: %v/%v Stone: %v/%v Gold: %v/%v Iron: %v/%v",
+		used.Food, available.Food,
+		used.Wood, available.Wood,
+		used.Stone, available.Stone,
+		used.Gold, available.Gold,
+		used.Iron, available.Iron,
+	)
 
 	u.resources.Sprite.Image().Fill(colornames.Black)
 	bounds := text.BoundString(u.Config.UI.Font, content)
@@ -75,7 +80,7 @@ func (u UISystem) updateResources(resources components.Resources) {
 func (u UISystem) HandleEvent(e engine.Event) {
 	switch event := e.(type) {
 	case ResourcesUpdated:
-		u.updateResources(event.Resources)
+		u.updateResources(event.UsedResources, event.AvailableResources)
 	}
 }
 
