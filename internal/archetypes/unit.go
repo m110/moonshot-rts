@@ -38,11 +38,11 @@ func NewUnit(team components.Team, class components.Class, spriteGetter spriteGe
 
 	colliderBounds := engine.Rect{
 		Position: engine.Vector{
-			X: -5,
-			Y: -5,
+			X: 0,
+			Y: 0,
 		},
-		Width:  10,
-		Height: 5,
+		Width:  1,
+		Height: 1,
 	}
 	colliderOverlay := NewOverlay(int(colliderBounds.Width), int(colliderBounds.Height), engine.PivotTopLeft, colornames.Red)
 
