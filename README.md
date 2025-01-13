@@ -2,6 +2,8 @@
 
 This is a game in development for [Github Game Off 2020](https://itch.io/jam/game-off-2020). Made in Go with [ebiten](https://github.com/hajimehoshi/ebiten).
 
+https://github.com/user-attachments/assets/b4b0df0c-69e5-4fe5-b286-82a1062105a1
+
 ## Why Go?
 
 While I usually use Unity for game jams, I decided to try writing a game in Go this time.
